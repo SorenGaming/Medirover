@@ -62,7 +62,7 @@ def register_dashboard(app, connect):
     @app.get("/api/orders")
     def history(
         station: int | None = Query(None, ge=1, le=2),
-        status: Literal["pending", "running", "completed"] | None = None,
+        status: Literal["pending", "running", "delivered", "completed", "stopped", "cancelled", "rejected"] | None = None,
         limit: int = Query(25, ge=1, le=100),
         offset: int = Query(0, ge=0, le=1000000),
     ):
@@ -74,7 +74,7 @@ def register_dashboard(app, connect):
                 parameters,
             ).fetchone()["total"]
             items = connection.execute(
-                "SELECT request_id, station, status, created_at FROM medirover_orders "
+                "SELECT request_id, station, status, last_error, created_at FROM medirover_orders "
                 + conditions + " ORDER BY created_at DESC, request_id DESC LIMIT %s OFFSET %s",
                 (*parameters, limit, offset),
             ).fetchall()

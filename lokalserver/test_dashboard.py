@@ -55,7 +55,7 @@ def test_website_and_missing_database(monkeypatch):
 
 
 def test_history_and_having_use_real_postgresql(client):
-    seed(1, "completed"); seed(1, "completed"); seed(1, "pending")
+    seed(1, "completed"); seed(1, "completed"); seed(1, "rejected")
     seed(2, "completed"); seed(2, "running")
     assert client.get("/api/orders").json()["total"] == 5
     page = client.get("/api/orders?station=1&status=completed&limit=1&offset=1").json()
@@ -90,7 +90,7 @@ def test_temperature_missing_fresh_stale_and_uart(client):
     assert client.get("/api/temperature").json()["state"] == "stale"
     request_id = uuid4()
     accept_frame(f"ACK,{request_id},1\n".encode(), lambda *args: receipts.append(args), save)
-    assert receipts == [(request_id,1)]
+    assert receipts == [("ACK", request_id, "1")]
     with pytest.raises(ValueError):
         store_temperature(connect, float("nan"))
     assert client.post("/api/temperature", json={"temperature_c":20}).status_code == 405

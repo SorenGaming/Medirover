@@ -2,13 +2,15 @@ MEDIROVER – HJEMMESIDE OG LOKALSERVER
 
 Siden har historik, stationsdiagram med GROUP BY/HAVING samt temperatur
 og relativ luftfugtighed fra boksen.
-Den er kun til aflæsning. De eksisterende bestillingskald er bevaret.
+Panelet Tur bestiller og styrer bilen: Bestil, Pakket – send bilen,
+Fortsæt (efter en fejl), Stop og Afslut tur (efter Stop).
 Hvis en måling mangler, vises en streg.
 
 BROWSER PÅ MEDIROVER-NETTET
 Åbn https://10.20.20.10/ fra betjeningsmaskinen med jeres betroede
-Medirover-certifikat. nginx håndterer HTTPS og sender kun sidens læsekald
-videre til FastAPI. FastAPI læser fra PostgreSQL på samme maskine.
+Medirover-certifikat. nginx håndterer HTTPS og sender kun sidens kald
+videre til FastAPI: GET, og POST til bestilling og turens knapper.
+FastAPI læser fra PostgreSQL på samme maskine.
 Stien /net-test bruges fortsat til at teste HTTPS.
 
 KLARGØR UBUNTU FRA DENNE MAPPE
@@ -22,31 +24,52 @@ eksisterende bestillinger og målinger og tilføjer luftfugtighedskolonnen.
 
 psql -X -v ON_ERROR_STOP=1 -d medirover_demo -f schema.sql
 
+Skemaet tillader kun én aktiv tur (pending, running, delivered eller
+stopped). Står der gamle ture som pending eller running, stopper
+indlæsningen. Afslut dem først:
+psql -d medirover_demo -c "UPDATE medirover_orders SET status = 'cancelled' WHERE status IN ('pending', 'running')"
+
 Under drift/ ligger den lille systemd-service, nginx-reglen til sidens
-læsekald og nginx-indstillingen til at prøve igen ved en opstartsfejl.
+kald og nginx-indstillingen til at prøve igen ved en opstartsfejl.
 Servicen bruges fra /home/soren/Medirover/lokalserver og lytter lokalt på
 127.0.0.1:8000. Swagger på /docs bruges lokalt til udvikling.
 MEDIROVER_DEMO=1 markerer den eksisterende database som en demo.
 
+BASEN PÅ USB/UART (115200 baud, én ASCII-linje pr. besked, LF)
+MEDIROVER_UART_PORT peger på basen, fx /dev/serial/by-id/... Servicen
+skal være i gruppen dialout. Porten åbnes uden DTR/RTS, så ESP32 ikke
+genstarter, og den åbnes igen hvert 2. sekund, hvis USB forsvinder.
+<id> er turens UUID.
+
+Server -> base. Basen svarer OK,<id> eller NAK,<id>,<grund> inden for 3 s.
+  ORDER,<id>,<1|2>  knappen Bestil. Bilen skal holde i basen.
+  KLAR,<id>         Pakket – send bilen
+  STOP,<id>         Stop. Bilen og lågene står stille
+  FORTSAET,<id>     Fortsæt efter en fejl
+  LUK,<id>          Afslut tur efter Stop. Lågene lukker
+  NAK-grunde: BUSY, NOT_HOME, NO_ROVER, WRONG_TRIP, BAD
+
+Base -> server. Kun disse gemmes:
+  STARTED,<id>,<st>   pending   -> running
+  ACK,<id>,<st>       running   -> delivered (stationens knap)
+  HOME,<id>           running/delivered -> completed (bilen er fri igen)
+  ERR,<id>,<kode>     last_error. ERR,<id>,STOPPED -> stopped
+  TEMP,rover,<°C>,<%RH>
+ARRIVED, HALL, LID, OBST, CLEAR og linjer med "#" logges kun.
+
 MÅLINGER FRA BOKSEN
-UART-format med begge værdier er TEMP,rover,22,45 efterfulgt af
-ét linjeskift. Første værdi er °C, anden er relativ luftfugtighed i
-procent. Den eksisterende form TEMP,rover,22 virker fortsat.
-Brug decimalpunktum og højst to decimaler. ACK-formatet er uændret.
-MEDIROVER_UART_PORT og 115200 baud bruges som før.
-På bilens DHT11 læses de to værdier efter samme `measure()`. Aftal med
-firmwaregruppen, at basen videresender målingen over USB/UART i formatet
-ovenfor. Firmware og fysisk transmission skal prøves med den færdige bil.
 Serveren gemmer de to værdier med ét modtagelsestidspunkt. Efter 120
 sekunder markeres målingen som gammel. Indgangsvalidering accepterer
 -100 til 150 °C og 0 til 100 procent relativ luftfugtighed.
+Den gamle form TEMP,rover,22 uden luftfugtighed virker fortsat.
 
 PRØVER
 python -m pip install -r requirements-test.txt
 Angiv MEDIROVER_TEST_DSN til en særskilt testdatabase med CREATE SCHEMA.
 python -m pytest -q -p no:cacheprovider
 Testene fjerner kun deres egne skemaer med tilfældige navne.
-Prøverne dækker også UART-rammer med luftfugtighed og tidligere data.
+Prøverne dækker også hele turen med en falsk base, UART-rammer med
+luftfugtighed og tidligere data. test_uart.py kører uden database.
 Billederne viser tydeligt mærkede testture, ikke fysiske kørselstests.
 
 Teknisk grundlag:
