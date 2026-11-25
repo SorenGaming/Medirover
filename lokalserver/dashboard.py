@@ -1,4 +1,3 @@
-"""Read-only website, PostgreSQL statistics and box temperature storage."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import math
@@ -35,7 +34,6 @@ def database(connect):
 
 
 def store_temperature(connect, value, humidity_percent=None):
-    """Store a received measurement; never manufacture a sensor reading."""
     if isinstance(value, bool) or not math.isfinite(value) or not -100 <= value <= 150:
         raise ValueError("Invalid temperature")
     if humidity_percent is not None and (
@@ -62,7 +60,7 @@ def register_dashboard(app, connect):
     @app.get("/api/orders")
     def history(
         station: int | None = Query(None, ge=1, le=2),
-        status: Literal["pending", "running", "completed"] | None = None,
+        status: Literal["pending", "running", "delivered", "completed", "stopped", "cancelled", "rejected"] | None = None,
         limit: int = Query(25, ge=1, le=100),
         offset: int = Query(0, ge=0, le=1000000),
     ):
@@ -74,7 +72,7 @@ def register_dashboard(app, connect):
                 parameters,
             ).fetchone()["total"]
             items = connection.execute(
-                "SELECT request_id, station, status, created_at FROM medirover_orders "
+                "SELECT request_id, station, status, last_error, created_at FROM medirover_orders "
                 + conditions + " ORDER BY created_at DESC, request_id DESC LIMIT %s OFFSET %s",
                 (*parameters, limit, offset),
             ).fetchall()

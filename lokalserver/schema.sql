@@ -8,12 +8,15 @@ CREATE TABLE IF NOT EXISTS medirover_orders (
 );
 
 ALTER TABLE medirover_orders
+    ADD COLUMN IF NOT EXISTS last_error text,
     DROP CONSTRAINT IF EXISTS medirover_orders_status_check,
-    ADD CONSTRAINT medirover_orders_status_check
-        CHECK (status IN ('pending', 'running', 'completed'));
+    ADD CONSTRAINT medirover_orders_status_check CHECK (status IN (
+        'pending', 'running', 'delivered', 'completed', 'stopped', 'cancelled', 'rejected'));
 
-CREATE UNIQUE INDEX IF NOT EXISTS medirover_one_running_order
-    ON medirover_orders (status) WHERE status = 'running';
+-- one rover: one active trip
+DROP INDEX IF EXISTS medirover_one_running_order;
+CREATE UNIQUE INDEX IF NOT EXISTS medirover_one_active_order
+    ON medirover_orders ((true)) WHERE status IN ('pending', 'running', 'delivered', 'stopped');
 
 CREATE TABLE IF NOT EXISTS medirover_temperatures (
     id bigserial PRIMARY KEY,

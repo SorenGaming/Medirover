@@ -88,7 +88,8 @@ th { color: var(--muted); font-size: 13px; font-weight: 600; padding: 12px 10px;
 td { padding: 15px 10px; border-bottom: 1px solid var(--tint); font-size: 14px; }
 td.id { font: 13px ui-monospace, Consolas, monospace; color: var(--muted); }
 .badge { display: inline-block; border-radius: 6px; padding: 4px 9px; background: var(--tint); color: var(--muted); font-size: 13px; }
-.badge.running { background: var(--tint-strong); color: var(--accent-dark); }
+.badge.running, .badge.delivered { background: var(--tint-strong); color: var(--accent-dark); }
+.trip { margin-bottom: 22px; }
 .badge.completed { background: var(--accent); color: var(--surface); }
 .pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
 .pagination > div { display: flex; gap: 10px; }

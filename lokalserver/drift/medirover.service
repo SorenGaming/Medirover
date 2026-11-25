@@ -8,6 +8,9 @@ User=soren
 WorkingDirectory=/home/soren/Medirover/lokalserver
 Environment=MEDIROVER_DATABASE_DSN=dbname=medirover_demo
 Environment=MEDIROVER_DEMO=1
+# The base ESP32 on USB. Find the name with: ls /dev/serial/by-id/
+Environment=MEDIROVER_UART_PORT=/dev/serial/by-id/<BASENS-USB>
+SupplementaryGroups=dialout
 ExecStart=/home/soren/Medirover/lokalserver/.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8000
 Restart=on-failure
 RestartSec=5s
