@@ -1,0 +1,50 @@
+MEDIROVER – HJEMMESIDE OG LOKALSERVER, 24. NOVEMBER 2026
+
+Status: lokal prototype, testet mod PostgreSQL 18.6. Ikke installeret på
+Ubuntu her. Den maskine kunne ikke nås fra denne computer.
+
+Siden har historik, stationsdiagram med GROUP BY/HAVING og temperatur.
+Den er kun til aflæsning. De eksisterende bestillingskald er bevaret.
+Der vises ingen opdigtet temperatur, hvis boksen ikke har sendt en måling.
+
+START PÅ UBUNTU FRA DENNE MAPPE
+python3 -m venv .venv
+. .venv/bin/activate
+python -m pip install -r requirements.txt
+
+Bevar den eksisterende database og rolle. Angiv MEDIROVER_DATABASE_DSN
+via den beskyttede konfiguration. Ingen adgangskode skal i kildekoden.
+Læs schema.sql ind med den eksisterende databaseejer via psql.
+Det bevarer bestillinger og opretter temperaturtabel og indeks.
+Læg ikke testdata ind i driftsdatabasen.
+
+python -m uvicorn app:app --host 127.0.0.1 --port 8000
+Åbn http://127.0.0.1:8000/ på Ubuntu. Fra Windows bruges SSH-tunnelen:
+ssh -N -L 127.0.0.1:8000:127.0.0.1:8000 soren@10.20.20.10
+Åbn samme lokale adresse i Windows. Port 8000 skal ikke åbnes på LAN.
+Den eksisterende nginx HTTPS-server og /net-test bevares. Endelig
+proxy, systemd-service og servicebruger skal afstemmes og testes på Ubuntu.
+
+TEMPERATURMODTAGELSE
+Det ekstra foreløbige UART-format er TEMP,rover,21.75 efterfulgt af
+ét linjeskift. Decimalpunktum, højst to decimaler. ACK-formatet er uændret.
+MEDIROVER_UART_PORT og 115200 baud bruges som før.
+Bil/base-firmware er ikke ændret her. Basen skal senere videresende den
+rigtige måling fra bilen. Modtagerformatet skal afstemmes med firmware.
+Modtagelsestid registreres på serveren. Efter 120 sekunder vises målingen
+som gammel; dette er en teknisk friskhedsgrænse, ikke en medicinsk grænse.
+Inputintervallet -100 til 150 °C er validering, ikke en sensorspecifikation.
+Der findes ingen offentlig POST-endpoint til at indsætte temperaturer.
+
+PRØVER
+python -m pip install -r requirements-test.txt
+Angiv MEDIROVER_TEST_DSN til en særskilt testdatabase med CREATE SCHEMA.
+python -m pytest -q -p no:cacheprovider
+Testene fjerner kun deres egne skemaer med tilfældige navne.
+16 prøver bestod mod en særskilt PostgreSQL 18.6. Browserfiltre er afprøvet.
+Billederne viser tydeligt mærkede testture, ikke fysiske kørselstests.
+
+Teknisk grundlag:
+https://fastapi.tiangolo.com/tutorial/static-files/
+https://www.postgresql.org/docs/18/queries-table-expressions.html
+https://fastapi.tiangolo.com/tutorial/testing/

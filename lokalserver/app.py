@@ -13,6 +13,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from serial import Serial
 
 from uart import read_receipts
+from dashboard import register_dashboard, store_temperature
 
 Station = Annotated[int, Field(strict=True, ge=1, le=2)]
 
@@ -27,7 +28,7 @@ async def lifespan(_app):
     with Serial(device, baudrate=115200, timeout=0.2) as port:
         worker = Thread(
             target=read_receipts,
-            args=(port, stop, accept_station_receipt),
+            args=(port, stop, accept_station_receipt, lambda value: store_temperature(connect, value)),
             name="medirover-uart",
             daemon=True,
         )
@@ -65,6 +66,9 @@ def connect():
     if not dsn:
         raise HTTPException(503, "Database is not configured")
     return psycopg.connect(dsn, connect_timeout=3, row_factory=dict_row)
+
+
+register_dashboard(app, connect)
 
 
 @app.get("/api/health")

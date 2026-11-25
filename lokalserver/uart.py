@@ -12,9 +12,10 @@ ACK = re.compile(
     rb"(?P<station>[12])\r?\n"
 )
 MAX_FRAME = 64
+TEMPERATURE = re.compile(rb"TEMP,rover,(?P<celsius>-?\d{1,3}(?:\.\d{1,2})?)\r?\n")
 
 
-def read_receipts(port, stop, acknowledge):
+def read_receipts(port, stop, acknowledge, temperature_callback=None):
     frame = bytearray()
     discard = False
     try:
@@ -28,7 +29,7 @@ def read_receipts(port, stop, acknowledge):
                 if discard:
                     LOG.warning("UART rejected: frame too long")
                 else:
-                    accept_frame(frame, acknowledge)
+                    accept_frame(frame, acknowledge, temperature_callback)
                 frame.clear()
                 discard = False
             elif len(frame) >= MAX_FRAME:
@@ -38,7 +39,20 @@ def read_receipts(port, stop, acknowledge):
         LOG.exception("UART reader stopped")
 
 
-def accept_frame(frame, acknowledge):
+def accept_frame(frame, acknowledge, temperature_callback=None):
+    measurement = TEMPERATURE.fullmatch(frame)
+    if measurement is not None:
+        value = float(measurement["celsius"])
+        if temperature_callback is None or not -100 <= value <= 150:
+            LOG.warning("UART rejected: temperature receiver unavailable or invalid value")
+            return
+        try:
+            temperature_callback(value)
+        except HTTPException:
+            LOG.warning("UART rejected: temperature storage unavailable")
+        else:
+            LOG.info("UART temperature stored: %.2f C", value)
+        return
     match = ACK.fullmatch(frame)
     if match is None:
         LOG.warning("UART rejected: invalid frame")

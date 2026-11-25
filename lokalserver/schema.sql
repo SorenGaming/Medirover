@@ -15,4 +15,12 @@ ALTER TABLE medirover_orders
 CREATE UNIQUE INDEX IF NOT EXISTS medirover_one_running_order
     ON medirover_orders (status) WHERE status = 'running';
 
+CREATE TABLE IF NOT EXISTS medirover_temperatures (
+    id bigserial PRIMARY KEY,
+    temperature_c numeric(5,2) NOT NULL CHECK (temperature_c BETWEEN -100 AND 150),
+    measured_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+CREATE INDEX IF NOT EXISTS medirover_temperature_latest
+    ON medirover_temperatures (measured_at DESC, id DESC);
+
 COMMIT;
