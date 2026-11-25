@@ -16,7 +16,7 @@ KP, KI = 0.0358, 0.061
 LKP, LKD = 0.25, 0.06
 DREJ90_MAKS, DREJ180_MAKS = 36, 67
 
-FART, DREJFART, KRYBFART = 250, 160, 120  # pulser/s
+FART, DREJFART, KRYBFART = 300, 160, 120  # pulser/s
 I_MAKS, LMAKS = 40, 0.5
 BREMSE_MS = 150
 BOOST_RATE, BOOST_MAKS = 40, 30
@@ -158,7 +158,7 @@ class Servo:
             self._puls()
             return
         rest = abs(self.maal - self.us)
-        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 5)
+        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 7)
         self.us += trin if self.maal > self.us else -trin
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:
