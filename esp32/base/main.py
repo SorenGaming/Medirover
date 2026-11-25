@@ -133,7 +133,7 @@ class Servo:
             self._puls()
             return
         rest = abs(self.maal - self.us)
-        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 5)
+        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 7)
         self.us += trin if self.maal > self.us else -trin
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:

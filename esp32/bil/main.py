@@ -16,7 +16,7 @@ KP, KI = 0.0358, 0.061
 LKP, LKD = 0.25, 0.06
 DREJ90_MAKS, DREJ180_MAKS = 36, 67
 
-FART, DREJFART, KRYBFART = 250, 160, 120  # pulser/s
+FART, DREJFART, KRYBFART = 350, 160, 120  # pulser/s
 I_MAKS, LMAKS = 40, 0.5
 BREMSE_MS = 150
 BOOST_RATE, BOOST_MAKS = 40, 30
@@ -27,6 +27,7 @@ RET_CM, SOEG_CM = 8, 10
 DREJ_MIN_180, DREJ_MIN_90 = 0.54, 0.42
 START_FART, LMAKS_START = 0.6, 0.8
 FORHINDRING, FRI, FRI_MS = 15, 20, 1000
+FORHINDRING_STOP, FRI_STOP = 6, 8  # cm: stationen staar 10 cm fra stregen
 RUTER = {'B1': 'VS', 'B2': 'LHS', '1B': 'HS', '2B': 'VLS'}  # V/H drej, L ligeud, S stop
 NEO_LYS = 30
 FARVER = {'klar': (0, 0, 255), 'pak': (0, 200, 200), 'koer': (0, 255, 0),
@@ -158,7 +159,7 @@ class Servo:
             self._puls()
             return
         rest = abs(self.maal - self.us)
-        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 5)
+        trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 7)
         self.us += trin if self.maal > self.us else -trin
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:
@@ -257,7 +258,7 @@ class Bil:
         self.taet = [0, 0]
         self.us_cm = [999, 999]
         self.us_til = False
-        self.graense = FORHINDRING
+        self.graense, self.fri = FORHINDRING, FRI
         self.np = NeoPixel(Pin(18), 24)
         self.dht = dht.DHT11(Pin(14))
         self.net = Net('R')
@@ -365,7 +366,7 @@ class Bil:
             cm = t / 58 if t > 0 else 999
             self.us_cm[self.usi] = cm
             self.taet[self.usi] = self.taet[self.usi] + 1 if cm < self.graense else 0
-            if cm < FRI:
+            if cm < self.fri:
                 self.sidst_taet = time.ticks_ms()
         self.usi ^= 1
 
@@ -476,9 +477,8 @@ class Bil:
         t = time.ticks_ms()
         vl = vh = FART
         while True:
-            mod_stop = self.rute[0] == 'S'  # stationen er ingen forhindring
-            self.graense = 0 if mod_stop else FORHINDRING
-            self.sikkerhed(not mod_stop)
+            self.graense, self.fri = (FORHINDRING_STOP, FRI_STOP) if self.rute[0] == 'S' else (FORHINDRING, FRI)
+            self.sikkerhed(True)
             self.tik()
             v, c, h = self.ir()
             d = self.afstand()
