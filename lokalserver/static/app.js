@@ -1,6 +1,6 @@
 "use strict";
 const $ = id => document.getElementById(id);
-const statuses = {pending:"Pakkes",running:"Kører",delivered:"Afleveret",completed:"Hjemme",stopped:"Stoppet",cancelled:"Afbrudt",rejected:"Afvist"};
+const statuses = {pending:"Pakkes",running:"Kører",delivered:"Afleveret",completed:"Fuldført",stopped:"Stoppet",cancelled:"Afbrudt",rejected:"Afvist"};
 // samme regler som CONTROLS i app.py
 const active = ["pending","running","delivered","stopped"];
 const buttons = {packed:["pending"], resume:["running","delivered"], stop:active, close:["stopped"]};

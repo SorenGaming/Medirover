@@ -90,7 +90,7 @@ td.id { font: 13px ui-monospace, Consolas, monospace; color: var(--muted); }
 .badge { display: inline-block; border-radius: 6px; padding: 4px 9px; background: var(--tint); color: var(--muted); font-size: 13px; }
 .badge.running, .badge.delivered { background: var(--tint-strong); color: var(--accent-dark); }
 .trip { margin-bottom: 22px; }
-.badge.completed { background: var(--accent); color: var(--surface); }
+.badge.completed { background: #236146; color: var(--surface); }
 .pagination { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; margin-top: 16px; }
 .pagination > div { display: flex; gap: 10px; }
 footer { display: flex; justify-content: space-between; gap: 16px; color: var(--muted); font-size: 13px; margin: 25px 4px; }
