@@ -10,3 +10,5 @@ __pycache__/
 *.log
 *.sql.gz
 *.dump
+/lokalserver/static/backup-status.json
+/lokalserver/static/.backup-status.*

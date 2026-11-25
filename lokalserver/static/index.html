@@ -1,10 +1,18 @@
 <!doctype html>
 <html lang="da">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medirover · Overblik</title><link rel="stylesheet" href="/static/style.css?v=5"><script src="/static/app.js?v=4" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medirover · Betjening</title><link rel="stylesheet" href="/static/style.css?v=6"><script src="/static/app.js?v=5" defer></script></head>
 <body>
-<header><a class="brand" href="/">medirover<span>Transport med overblik</span></a><div class="connection"><span id="connection">Kontrollerer forbindelse…</span><button id="refresh">Opdater</button></div></header>
+<header>
+  <a class="brand" href="#betjening">medirover<span>Transport med overblik</span></a>
+  <nav class="site-nav" aria-label="Hovedmenu">
+    <a id="control-link" href="#betjening" aria-current="page">Betjening</a>
+    <a id="history-link" href="#historik">Historik</a>
+  </nav>
+  <div class="connection"><span id="connection">Kontrollerer forbindelse…</span><button id="refresh">Opdater</button></div>
+</header>
 <main><!--environment-->
-<div class="intro"><div><p class="eyebrow">LOKALSERVER</p><h1>Overblik over turene</h1><p>Historik, afleveringer og målinger i bilens medicinrum.</p></div><p id="updated" class="muted" aria-live="polite">Henter data…</p></div>
+<section id="control-view" aria-labelledby="control-heading">
+<div class="intro"><h1 id="control-heading">Betjening</h1><p id="updated" class="muted" aria-live="polite">Henter data…</p></div>
 <section class="panel trip" aria-labelledby="trip-heading">
   <div class="panel-head"><h2 id="trip-heading">Tur</h2><span class="tag" id="trip-state">Henter…</span></div>
   <div class="filter-row">
@@ -17,7 +25,6 @@
   </div>
   <p id="trip-message" class="muted" aria-live="polite"></p>
 </section>
-<div class="top-grid">
 <section class="panel" aria-labelledby="measurements-heading">
   <h2 id="measurements-heading">Målinger i boksen</h2>
   <div class="measurements">
@@ -37,8 +44,64 @@
     </div>
   </div>
 </section>
-<section class="panel" aria-labelledby="chart-heading"><div class="panel-head"><h2 id="chart-heading">Afsluttede ture pr. station</h2><span class="tag">Alle registrerede ture</span></div><div class="filter-row"><label for="minimum">Vis stationer med mindst</label><input id="minimum" type="number" min="0" max="100000" value="0"><span>afsluttede ture</span><button id="apply-stats">Vis</button></div><div id="chart" class="chart" role="img" aria-label="Henter statistik"></div><p id="stats-message" class="muted" aria-live="polite"></p><details><summary>Sådan beregnes diagrammet</summary><p>Databasen samler turene pr. station med <code>GROUP BY</code>. <code>HAVING</code> vælger de stationer, der har mindst det valgte antal afsluttede ture. Filteret ændrer kun diagrammet.</p></details></section>
-</div>
-<section class="panel history" aria-labelledby="history-heading"><div class="panel-head"><div><p class="eyebrow">TURE</p><h2 id="history-heading">Historik</h2></div><span id="total" class="muted">—</span></div><div class="filter-row"><label for="station">Station</label><select id="station"><option value="">Alle stationer</option><option value="1">Station 1</option><option value="2">Station 2</option></select><label for="status">Status</label><select id="status"><option value="">Alle statusser</option><option value="pending">Pakkes</option><option value="running">Kører</option><option value="delivered">Afleveret</option><option value="completed">Fuldført</option><option value="stopped">Stoppet</option><option value="cancelled">Afbrudt</option><option value="rejected">Afvist</option></select></div><div class="table-scroll"><table><thead><tr><th>Oprettet</th><th>Tur-ID</th><th>Station</th><th>Status</th></tr></thead><tbody id="history"><tr><td colspan="4">Henter historik…</td></tr></tbody></table></div><div class="pagination"><p id="history-message" class="muted" aria-live="polite"></p><div><button id="previous" disabled>Forrige</button><button id="next" disabled>Næste</button></div></div></section>
+</section>
+<section id="history-view" aria-labelledby="history-heading" hidden>
+  <div class="intro">
+    <h1 id="history-heading">Turhistorik</h1>
+    <div class="backup-status">
+      <span class="muted">Seneste backup</span>
+      <p id="backup-time" aria-live="polite">Henter tidspunkt…</p>
+    </div>
+  </div>
+  <section class="panel history" aria-labelledby="orders-heading">
+    <div class="panel-head">
+      <h2 id="orders-heading">Registrerede ture</h2>
+      <span id="total" class="muted">—</span>
+    </div>
+    <div class="filter-row">
+      <label for="station">Station</label>
+      <select id="station">
+        <option value="">Alle stationer</option>
+        <option value="1">Station 1</option>
+        <option value="2">Station 2</option>
+      </select>
+      <label for="status">Status</label>
+      <select id="status">
+        <option value="">Alle statusser</option>
+        <option value="pending">Pakkes</option>
+        <option value="running">Kører</option>
+        <option value="delivered">Afleveret</option>
+        <option value="completed">Fuldført</option>
+        <option value="stopped">Stoppet</option>
+        <option value="cancelled">Afbrudt</option>
+        <option value="rejected">Afvist</option>
+      </select>
+    </div>
+    <div class="table-scroll">
+      <table>
+        <thead><tr><th>Oprettet</th><th>Tur-ID</th><th>Station</th><th>Status</th></tr></thead>
+        <tbody id="history"><tr><td colspan="4">Henter historik…</td></tr></tbody>
+      </table>
+    </div>
+    <div class="pagination">
+      <p id="history-message" class="muted" aria-live="polite"></p>
+      <div><button id="previous" disabled>Forrige</button><button id="next" disabled>Næste</button></div>
+    </div>
+  </section>
+  <section class="panel" aria-labelledby="chart-heading">
+    <h2 id="chart-heading">Afsluttede ture pr. station</h2>
+    <div class="filter-row">
+      <label for="minimum">Vis stationer med mindst</label>
+      <input id="minimum" type="number" min="0" max="100000" value="0">
+      <span>afsluttede ture</span><button id="apply-stats">Vis</button>
+    </div>
+    <div id="chart" class="chart" role="img" aria-label="Henter statistik"></div>
+    <p id="stats-message" class="muted" aria-live="polite"></p>
+    <details>
+      <summary>Sådan beregnes diagrammet</summary>
+      <p>Databasen samler turene pr. station med <code>GROUP BY</code>. <code>HAVING</code> vælger de stationer, der har mindst det valgte antal afsluttede ture. Filteret ændrer kun diagrammet.</p>
+    </details>
+  </section>
+</section>
 <footer><span>Medirover · Skoleprototype · Kun fiktive bestillinger</span><span>Automatisk opdatering hvert 20. sekund</span></footer>
 </main></body></html>

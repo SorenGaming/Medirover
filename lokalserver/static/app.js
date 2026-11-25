@@ -5,6 +5,9 @@ const statuses = {pending:"Pakkes",running:"Kører",delivered:"Afleveret",comple
 const active = ["pending","running","delivered","stopped"];
 const buttons = {packed:["pending"], resume:["running","delivered"], stop:active, close:["stopped"]};
 const time = value => new Date(value).toLocaleString("da-DK");
+const backupTime = new Intl.DateTimeFormat("da-DK", {
+  dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Copenhagen"
+});
 const formatReading = value => Number(value).toLocaleString("da-DK", {
   minimumFractionDigits: 1,
   maximumFractionDigits: 2
@@ -14,6 +17,33 @@ async function api(path) {
   const response = await fetch(path, {cache:"no-store", signal:AbortSignal.timeout(7000)});
   if (!response.ok) throw new Error(`HTTP ${response.status}`);
   return response.json();
+}
+function showView() {
+  const history = window.location.hash === "#historik";
+  $("control-view").hidden = history;
+  $("history-view").hidden = !history;
+  const current = history ? "history-link" : "control-link";
+  const other = history ? "control-link" : "history-link";
+  $(current).setAttribute("aria-current", "page");
+  $(other).removeAttribute("aria-current");
+  document.title = history ? "Medirover · Historik" : "Medirover · Betjening";
+}
+async function loadBackupStatus() {
+  try {
+    const response = await fetch("/static/backup-status.json", {
+      cache: "no-store", signal: AbortSignal.timeout(7000)
+    });
+    if (response.status === 404) {
+      $("backup-time").textContent = "Ingen bekræftet backup endnu";
+      return;
+    }
+    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+    const data = await response.json();
+    if (typeof data.last_success_at !== "string") throw new Error("Missing backup timestamp");
+    $("backup-time").textContent = backupTime.format(new Date(data.last_success_at));
+  } catch (error) {
+    $("backup-time").textContent = "Tidspunkt ikke tilgængeligt";
+  }
 }
 function message(id, text, type="") { $(id).textContent=text; $(id).classList.remove("error","warning"); if(type) $(id).classList.add(type); }
 function cell(row, text, className="") { const td=document.createElement("td"); td.textContent=text; if(className) td.className=className; row.append(td); return td; }
@@ -102,5 +132,14 @@ async function post(path, body) {
 }
 $("order").addEventListener("click",()=>post("/api/orders",{request_id:crypto.randomUUID(), station:Number($("order-station").value)}));
 for (const id in buttons) $(id).addEventListener("click",()=>post(`/api/orders/${trip.request_id}/${id}`));
-refresh(); setInterval(refresh,20000);
+function refreshPage() {
+  refresh();
+  if (!$("history-view").hidden) loadBackupStatus();
+}
+window.addEventListener("hashchange", () => {
+  showView();
+  refreshPage();
+});
+showView();
+refreshPage(); setInterval(refreshPage,20000);
 loadTrip(); setInterval(loadTrip,2000);
