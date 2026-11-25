@@ -4,7 +4,8 @@ After=postgresql.service
 Wants=postgresql.service
 
 [Service]
-User=soren
+User=medirover
+Environment=PYTHONDONTWRITEBYTECODE=1
 WorkingDirectory=/home/soren/Medirover/lokalserver
 Environment=MEDIROVER_DATABASE_DSN=dbname=medirover_demo
 Environment=MEDIROVER_DEMO=1
