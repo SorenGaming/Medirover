@@ -1,0 +1,12 @@
+.env
+.env.*
+*.key
+*.pem
+*.pgpass
+.venv/
+__pycache__/
+.pytest_cache/
+*.pyc
+*.log
+*.sql.gz
+*.dump
