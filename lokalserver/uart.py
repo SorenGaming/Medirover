@@ -12,7 +12,10 @@ ACK = re.compile(
     rb"(?P<station>[12])\r?\n"
 )
 MAX_FRAME = 64
-TEMPERATURE = re.compile(rb"TEMP,rover,(?P<celsius>-?\d{1,3}(?:\.\d{1,2})?)\r?\n")
+TEMPERATURE = re.compile(
+    rb"TEMP,rover,(?P<celsius>-?\d{1,3}(?:\.\d{1,2})?)"
+    rb"(?:,(?P<humidity>\d{1,3}(?:\.\d{1,2})?))?\r?\n"
+)
 
 
 def read_receipts(port, stop, acknowledge, temperature_callback=None):
@@ -46,8 +49,15 @@ def accept_frame(frame, acknowledge, temperature_callback=None):
         if temperature_callback is None or not -100 <= value <= 150:
             LOG.warning("UART rejected: temperature receiver unavailable or invalid value")
             return
+        humidity = float(measurement["humidity"]) if measurement["humidity"] is not None else None
+        if humidity is not None and not 0 <= humidity <= 100:
+            LOG.warning("UART rejected: invalid relative humidity")
+            return
         try:
-            temperature_callback(value)
+            if humidity is None:
+                temperature_callback(value)
+            else:
+                temperature_callback(value, humidity)
         except HTTPException:
             LOG.warning("UART rejected: temperature storage unavailable")
         else:

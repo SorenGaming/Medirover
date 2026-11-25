@@ -20,6 +20,9 @@ CREATE TABLE IF NOT EXISTS medirover_temperatures (
     temperature_c numeric(5,2) NOT NULL CHECK (temperature_c BETWEEN -100 AND 150),
     measured_at timestamptz NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+ALTER TABLE medirover_temperatures
+    ADD COLUMN IF NOT EXISTS humidity_percent numeric(5,2)
+        CHECK (humidity_percent BETWEEN 0 AND 100);
 CREATE INDEX IF NOT EXISTS medirover_temperature_latest
     ON medirover_temperatures (measured_at DESC, id DESC);
 

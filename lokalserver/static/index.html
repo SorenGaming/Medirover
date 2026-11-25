@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="da">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medirover · Overblik</title><link rel="stylesheet" href="/static/style.css?v=3"><script src="/static/app.js" defer></script></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Medirover · Overblik</title><link rel="stylesheet" href="/static/style.css?v=3"><script src="/static/app.js?v=2" defer></script></head>
 <body>
 <header><a class="brand" href="/">medirover<span>Transport med overblik</span></a><div class="connection"><span id="connection">Kontrollerer forbindelse…</span><button id="refresh">Opdater</button></div></header>
 <main><!--environment-->
@@ -18,9 +18,10 @@
     </div>
     <div class="measurement">
       <h3>Luftfugtighed</h3>
-      <span class="tag">Ingen måling</span>
-      <p class="reading"><span>—</span><span class="unit">%</span></p>
-      <p class="muted">Afventer data fra boksen.</p>
+      <span class="tag" id="humidity-state">Afventer</span>
+      <p class="reading"><span id="humidity">—</span><span class="unit">%</span></p>
+      <p id="humidity-message" aria-live="polite">Henter seneste måling…</p>
+      <p id="humidity-time" class="muted" hidden></p>
     </div>
   </div>
 </section>

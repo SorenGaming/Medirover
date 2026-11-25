@@ -2,6 +2,7 @@
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
+from functools import partial
 from threading import Event, Thread
 from typing import Annotated, Literal
 from uuid import UUID
@@ -28,7 +29,7 @@ async def lifespan(_app):
     with Serial(device, baudrate=115200, timeout=0.2) as port:
         worker = Thread(
             target=read_receipts,
-            args=(port, stop, accept_station_receipt, lambda value: store_temperature(connect, value)),
+            args=(port, stop, accept_station_receipt, partial(store_temperature, connect)),
             name="medirover-uart",
             daemon=True,
         )

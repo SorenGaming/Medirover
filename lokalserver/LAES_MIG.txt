@@ -1,8 +1,9 @@
 MEDIROVER – HJEMMESIDE OG LOKALSERVER
 
-Siden har historik, stationsdiagram med GROUP BY/HAVING og temperatur.
+Siden har historik, stationsdiagram med GROUP BY/HAVING samt temperatur
+og relativ luftfugtighed fra boksen.
 Den er kun til aflæsning. De eksisterende bestillingskald er bevaret.
-Der vises ingen opdigtet temperatur, hvis boksen ikke har sendt en måling.
+Hvis en måling mangler, vises en streg.
 
 BROWSER PÅ MEDIROVER-NETTET
 Åbn https://10.20.20.10/ fra betjeningsmaskinen med jeres betroede
@@ -17,7 +18,7 @@ python3 -m venv .venv
 På Medirover kører FastAPI som soren mod den eksisterende medirover_demo
 via PostgreSQLs lokale socket. PostgreSQL genkender den lokale bruger.
 Indlæs skemaet som databaseejeren med følgende kommando, som bevarer
-eksisterende bestillinger og opretter temperaturtabellen og dens indeks.
+eksisterende bestillinger og målinger og tilføjer luftfugtighedskolonnen.
 
 psql -X -v ON_ERROR_STOP=1 -d medirover_demo -f schema.sql
 
@@ -27,26 +28,29 @@ Servicen bruges fra /home/soren/Medirover/lokalserver og lytter lokalt på
 127.0.0.1:8000. Swagger på /docs bruges lokalt til udvikling.
 MEDIROVER_DEMO=1 markerer den eksisterende database som en demo.
 
-TEMPERATURMODTAGELSE
-Det ekstra foreløbige UART-format er TEMP,rover,21.75 efterfulgt af
-ét linjeskift. Decimalpunktum, højst to decimaler. ACK-formatet er uændret.
+MÅLINGER FRA BOKSEN
+UART-format med begge værdier er TEMP,rover,22,45 efterfulgt af
+ét linjeskift. Første værdi er °C, anden er relativ luftfugtighed i
+procent. Den eksisterende form TEMP,rover,22 virker fortsat.
+Brug decimalpunktum og højst to decimaler. ACK-formatet er uændret.
 MEDIROVER_UART_PORT og 115200 baud bruges som før.
-Bil/base-firmware er ikke ændret her. Basen skal senere videresende den
-rigtige måling fra bilen. Modtagerformatet skal afstemmes med firmware.
-Modtagelsestid registreres på serveren. Efter 120 sekunder vises målingen
-som gammel; dette er en teknisk friskhedsgrænse, ikke en medicinsk grænse.
-Inputintervallet -100 til 150 °C er validering, ikke en sensorspecifikation.
-Der findes ingen offentlig POST-endpoint til at indsætte temperaturer.
+På bilens DHT11 læses de to værdier efter samme `measure()`. Aftal med
+firmwaregruppen, at basen videresender målingen over USB/UART i formatet
+ovenfor. Firmware og fysisk transmission skal prøves med den færdige bil.
+Serveren gemmer de to værdier med ét modtagelsestidspunkt. Efter 120
+sekunder markeres målingen som gammel. Indgangsvalidering accepterer
+-100 til 150 °C og 0 til 100 procent relativ luftfugtighed.
 
 PRØVER
 python -m pip install -r requirements-test.txt
 Angiv MEDIROVER_TEST_DSN til en særskilt testdatabase med CREATE SCHEMA.
 python -m pytest -q -p no:cacheprovider
 Testene fjerner kun deres egne skemaer med tilfældige navne.
-16 prøver bestod mod en særskilt PostgreSQL 18.6. Browserfiltre er afprøvet.
+Prøverne dækker også UART-rammer med luftfugtighed og tidligere data.
 Billederne viser tydeligt mærkede testture, ikke fysiske kørselstests.
 
 Teknisk grundlag:
 https://fastapi.tiangolo.com/tutorial/static-files/
 https://www.postgresql.org/docs/18/queries-table-expressions.html
 https://fastapi.tiangolo.com/tutorial/testing/
+https://docs.micropython.org/en/latest/esp32/quickref.html#dht-driver

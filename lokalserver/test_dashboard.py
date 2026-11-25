@@ -74,7 +74,8 @@ def test_invalid_filters(client, query):
 
 
 def test_temperature_missing_fresh_stale_and_uart(client):
-    assert client.get("/api/temperature").json()["state"] == "missing"
+    empty = client.get("/api/temperature").json()
+    assert empty["state"] == "missing" and empty["humidity_percent"] is None
     receipts = []
     save = lambda value: store_temperature(connect, value)
     for frame in (b"TEMP,rover,nan\n", b"TEMP,rover,999\n", b"TEMP,rover,21.7", b"TEMP,station,21.7\n"):
@@ -83,6 +84,7 @@ def test_temperature_missing_fresh_stale_and_uart(client):
     accept_frame(b"TEMP,rover,21.75\n", lambda *args: receipts.append(args), save)
     reading = client.get("/api/temperature").json()
     assert reading["temperature_c"] == 21.75 and reading["state"] == "fresh"
+    assert reading["humidity_percent"] is None
     with connect() as connection:
         connection.execute("UPDATE medirover_temperatures SET measured_at = now() - interval '3 minutes'")
     assert client.get("/api/temperature").json()["state"] == "stale"
@@ -94,10 +96,40 @@ def test_temperature_missing_fresh_stale_and_uart(client):
     assert client.post("/api/temperature", json={"temperature_c":20}).status_code == 405
 
 
+def test_uart_stores_temperature_and_relative_humidity_together(client):
+    def save(temperature, humidity):
+        store_temperature(connect, temperature, humidity)
+
+    def acknowledge(*_):
+        pytest.fail("A sensor reading must never acknowledge an order")
+
+    for frame in (b"TEMP,rover,22,101\n", b"TEMP,rover,22,-1\n", b"TEMP,rover,22,nan\n"):
+        accept_frame(frame, acknowledge, save)
+    assert client.get("/api/temperature").json()["state"] == "missing"
+
+    accept_frame(b"TEMP,rover,22,0\r\n", acknowledge, save)
+    reading = client.get("/api/temperature").json()
+    assert reading["temperature_c"] == 22
+    assert reading["humidity_percent"] == 0
+    assert reading["state"] == "fresh"
+
+    accept_frame(b"TEMP,rover,23,100\n", acknowledge, save)
+    reading = client.get("/api/temperature").json()
+    assert (reading["temperature_c"], reading["humidity_percent"]) == (23, 100)
+
+
 def test_schema_is_repeatable_without_erasing_data(client):
     seed(1, "completed")
     store_temperature(connect, 19.2)
+    schema = Path(__file__).with_name("schema.sql").read_text(encoding="utf-8")
     with connect() as connection:
-        connection.execute(Path(__file__).with_name("schema.sql").read_text(encoding="utf-8"))
+        connection.execute("ALTER TABLE medirover_temperatures DROP COLUMN humidity_percent")
+    with connect() as connection:
+        connection.execute(schema)
     assert client.get("/api/orders").json()["total"] == 1
-    assert client.get("/api/temperature").json()["temperature_c"] == 19.2
+    previous = client.get("/api/temperature").json()
+    assert previous["temperature_c"] == 19.2 and previous["humidity_percent"] is None
+    store_temperature(connect, 20, 42)
+    with connect() as connection:
+        connection.execute(schema)
+    assert client.get("/api/temperature").json()["humidity_percent"] == 42
