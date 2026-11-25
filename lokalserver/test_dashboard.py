@@ -44,7 +44,10 @@ def test_website_and_missing_database(monkeypatch):
     monkeypatch.delenv("MEDIROVER_DATABASE_DSN", raising=False)
     monkeypatch.delenv("MEDIROVER_UART_PORT", raising=False)
     with TestClient(app) as client:
-        assert "Temperatur i boksen" in client.get("/").text
+        website = client.get("/")
+        assert "Målinger i boksen" in website.text
+        assert "Temperatur" in website.text
+        assert "Luftfugtighed" in website.text
         assert client.get("/static/app.js").status_code == 200
         assert client.get("/static/style.css").status_code == 200
         for endpoint in ("orders", "statistics", "temperature"):
