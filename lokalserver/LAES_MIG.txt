@@ -1,29 +1,31 @@
-MEDIROVER – HJEMMESIDE OG LOKALSERVER, 24. NOVEMBER 2026
-
-Status: lokal prototype, testet mod PostgreSQL 18.6. Ikke installeret på
-Ubuntu her. Den maskine kunne ikke nås fra denne computer.
+MEDIROVER – HJEMMESIDE OG LOKALSERVER
 
 Siden har historik, stationsdiagram med GROUP BY/HAVING og temperatur.
 Den er kun til aflæsning. De eksisterende bestillingskald er bevaret.
 Der vises ingen opdigtet temperatur, hvis boksen ikke har sendt en måling.
 
-START PÅ UBUNTU FRA DENNE MAPPE
+BROWSER PÅ MEDIROVER-NETTET
+Åbn https://10.20.20.10/ fra betjeningsmaskinen med jeres betroede
+Medirover-certifikat. nginx håndterer HTTPS og sender kun sidens læsekald
+videre til FastAPI. FastAPI læser fra PostgreSQL på samme maskine.
+Stien /net-test bruges fortsat til at teste HTTPS.
+
+KLARGØR UBUNTU FRA DENNE MAPPE
 python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements.txt
+.venv/bin/python -m pip install -r requirements.txt
 
-Bevar den eksisterende database og rolle. Angiv MEDIROVER_DATABASE_DSN
-via den beskyttede konfiguration. Ingen adgangskode skal i kildekoden.
-Læs schema.sql ind med den eksisterende databaseejer via psql.
-Det bevarer bestillinger og opretter temperaturtabel og indeks.
-Læg ikke testdata ind i driftsdatabasen.
+På Medirover kører FastAPI som soren mod den eksisterende medirover_demo
+via PostgreSQLs lokale socket. PostgreSQL genkender den lokale bruger.
+Indlæs skemaet som databaseejeren med følgende kommando, som bevarer
+eksisterende bestillinger og opretter temperaturtabellen og dens indeks.
 
-python -m uvicorn app:app --host 127.0.0.1 --port 8000
-Åbn http://127.0.0.1:8000/ på Ubuntu. Fra Windows bruges SSH-tunnelen:
-ssh -N -L 127.0.0.1:8000:127.0.0.1:8000 soren@10.20.20.10
-Åbn samme lokale adresse i Windows. Port 8000 skal ikke åbnes på LAN.
-Den eksisterende nginx HTTPS-server og /net-test bevares. Endelig
-proxy, systemd-service og servicebruger skal afstemmes og testes på Ubuntu.
+psql -X -v ON_ERROR_STOP=1 -d medirover_demo -f schema.sql
+
+Under drift/ ligger den lille systemd-service, nginx-reglen til sidens
+læsekald og nginx-indstillingen til at prøve igen ved en opstartsfejl.
+Servicen bruges fra /home/soren/Medirover/lokalserver og lytter lokalt på
+127.0.0.1:8000. Swagger på /docs bruges lokalt til udvikling.
+MEDIROVER_DEMO=1 markerer den eksisterende database som en demo.
 
 TEMPERATURMODTAGELSE
 Det ekstra foreløbige UART-format er TEMP,rover,21.75 efterfulgt af

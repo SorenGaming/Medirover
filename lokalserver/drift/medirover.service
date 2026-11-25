@@ -1,0 +1,16 @@
+[Unit]
+Description=Medirover lokalserver
+After=postgresql.service
+Wants=postgresql.service
+
+[Service]
+User=soren
+WorkingDirectory=/home/soren/Medirover/lokalserver
+Environment=MEDIROVER_DATABASE_DSN=dbname=medirover_demo
+Environment=MEDIROVER_DEMO=1
+ExecStart=/home/soren/Medirover/lokalserver/.venv/bin/python -m uvicorn app:app --host 127.0.0.1 --port 8000
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target
