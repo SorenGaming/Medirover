@@ -1,4 +1,3 @@
-"""Read-only website, PostgreSQL statistics and box temperature storage."""
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import math
@@ -35,7 +34,6 @@ def database(connect):
 
 
 def store_temperature(connect, value, humidity_percent=None):
-    """Store a received measurement; never manufacture a sensor reading."""
     if isinstance(value, bool) or not math.isfinite(value) or not -100 <= value <= 150:
         raise ValueError("Invalid temperature")
     if humidity_percent is not None and (

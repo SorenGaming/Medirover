@@ -1,16 +1,3 @@
-"""Medirover - BASE (KiCad Base 0.21). Gem som main.py. Sidder paa USB i Ubuntu-serveren.
-
-Serveren skriver een linje pr. kommando (ASCII, komma, LF). <id> er turens UUID:
-  ORDER,<id>,<1|2>   bilen skal holde i basen (Hall). Begge laag aabner til pakning.
-  KLAR,<id>          pakket: begge laag lukker, og bilen koerer.
-  STOP,<id>          bilen stopper, laagene bliver hvor de er. Turen er reserveret til LUK.
-  FORTSAET,<id>      bilen proever igen efter en fejl.
-  LUK,<id>           afslutter en stoppet tur: begge laag lukker langsomt.
-Basen svarer OK,<id> eller NAK,<id>,<grund> og sender bilens haendelser med turens id:
-  STARTED ARRIVED HALL LID ACK HOME OBST CLEAR ERR og TEMP,rover,<C>,<%RH>.  "# ..." er til mennesker.
-Laaget: start med LUKKET laag, og flyt det aldrig med haanden. SW101 skal vaere taendt.
-Ben: Hall GPIO4 (0 = magnet), servo GPIO23.
-"""
 from machine import Pin, PWM
 import time
 import gc
@@ -19,26 +6,22 @@ import select
 import network
 import espnow
 
-SERVO_AABEN, SERVO_LUKKET = 1075, 2050     # laag_finjuster.py 23/11
+SERVO_AABEN, SERVO_LUKKET = 1075, 2050  # us
 
-# ---------- Radio: ESP-NOW (samme kode paa alle fire) ----------
 KANAL = 1
 BC = b'\xff' * 6
 
 
 class Net:
-    """Besked = tekst 'fra,til,type,data...'. Enhederne laerer hinandens MAC af foerste besked
-    (alle siger HEJ ved opstart). Kendt modtager: unicast. vigtig=True venter paa modtagerens
-    kvittering og proever op til 4 gange. Ukendt modtager: broadcast (til-feltet filtrerer)."""
 
     def __init__(self, navn):
         w = network.WLAN(network.STA_IF)
         try:
             w.active(True)
-        except OSError:                   # "WiFi Out of Memory": ryd op og proev igen
-            gc.collect()
+        except OSError:
+            gc.collect()  # WiFi Out of Memory
             w.active(True)
-        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):   # samme kanal, ingen stroemspar
+        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):  # stroemspar taber beskeder
             try:
                 w.config(**kw)
             except (OSError, ValueError, AttributeError):
@@ -77,31 +60,23 @@ class Net:
                 continue
             if len(d) < 3:
                 continue
-            if self.mac.get(d[0]) != mac:          # ny (eller genstartet) enhed: husk MAC
+            if self.mac.get(d[0]) != mac:
                 try:
                     self.e.add_peer(mac)
                 except OSError:
                     pass
                 self.mac[d[0]] = mac
                 if d[2] == 'HEJ':
-                    self.send(d[0], 'HEJ')         # svar, saa den ogsaa kender os
+                    self.send(d[0], 'HEJ')
             if d[1] == self.navn or d[1] == '*':
                 ud.append((d[0], d[2], d[3:]))
 
 
-# ---------- Skaansom servo (samme kode paa base og bil) ----------
 SERVO_GPIO = 23
 SERVO_FIL = 'laag_us.txt'
 
 
 class Servo:
-    """MG90S, skaansomt (gearene er knaekket for mange gange):
-    - ingen puls foer foerste bevaegelse, og den starter ved den gemte stilling: intet ryk
-    - PWM oprettes med den rigtige pulsbredde (ellers kan ESP32 give 50 % duty et oejeblik)
-    - 2 us pr. 20 ms de foerste og sidste 100 us, ellers 5 us pr. 20 ms (ca. 5 s pr. bevaegelse)
-    - holder i aaben (laaget maa ikke falde), slipper i lukket (presser ikke)
-    - aldrig uden for aaben..lukket. Stillingen gemmes for hver 50 us og ved stop
-    Bevaegelsen sker i tik(), som kaldes tit. Den blokerer ikke."""
 
     def __init__(self, aaben, lukket):
         self.aaben, self.lukket = aaben, lukket
@@ -130,7 +105,7 @@ class Servo:
     def _puls(self):
         d = self.us * 65535 // 20000
         if self.pwm is None:
-            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)
+            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)  # duty fra start, ellers 50 % puls
         else:
             self.pwm.duty_u16(d)
         self.holder = True
@@ -155,7 +130,7 @@ class Servo:
             return
         self.t = time.ticks_add(nu, 20)
         if not self.holder:
-            self._puls()                          # griber ved den kendte stilling
+            self._puls()
             return
         rest = abs(self.maal - self.us)
         trin = min(rest, 2 if rest <= 100 or abs(self.us - self.fra) < 100 else 5)
@@ -163,12 +138,11 @@ class Servo:
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:
             self._gem()
-        if self.us == self.maal == self.lukket:
-            self.pwm.duty_u16(0)                  # laaget hviler: slip
+        if self.us == self.maal == self.lukket:  # lukket: slip
+            self.pwm.duty_u16(0)
             self.holder = False
 
     def sluk(self):
-        """Programmet stopper: luk langsomt foerst, saa laaget ikke falder."""
         self.flyt(self.lukket)
         while self.bevaeger():
             self.tik(time.ticks_ms())
@@ -179,10 +153,9 @@ class Servo:
 
 
 class Indgang:
-    """Afprellet indgang: skifter foerst, naar ny vaerdi har vaeret stabil i ms[ny vaerdi]."""
 
     def __init__(self, gpio, ms0, ms1):
-        self.p = Pin(gpio, Pin.IN)                # eksterne modstande paa printet
+        self.p = Pin(gpio, Pin.IN)
         self.ms = (ms0, ms1)
         self.v = self.k = self.p.value()
         self.t = time.ticks_ms()
@@ -202,9 +175,9 @@ def main():
     laag = Servo(SERVO_AABEN, SERVO_LUKKET)
     poll = select.poll()
     poll.register(sys.stdin, select.POLLIN)
-    bil = hall.v == 0                     # Hall ser bilen i basen
-    tur = None                            # turens id fra ORDER til HOME eller LUK
-    pak = False                           # bestilt, men ikke pakket endnu
+    bil = hall.v == 0
+    tur = None
+    pak = False
     linje = ''
     if laag.us != SERVO_LUKKET:
         print('# ADVARSEL: laaget stod ved %d us, ikke lukket' % laag.us)
@@ -212,11 +185,10 @@ def main():
     net.send('R', 'HALL', int(bil))
 
     def kommando(k, tid, a):
-        """Udfoer een kommando fra serveren. Returnerer None (OK) eller grunden til NAK."""
         nonlocal tur, pak
         if k == 'ORDER':
-            if tur == tid:
-                return None                   # samme bestilling sendt igen
+            if tur == tid:  # samme ordre igen
+                return None
             if tur:
                 return 'BUSY'
             if a not in ('1', '2'):
@@ -227,7 +199,7 @@ def main():
                 return 'NO_ROVER'
             tur, pak = tid, True
             laag.flyt(SERVO_AABEN)
-        elif k == 'LUK' and tur in (None, tid):
+        elif k == 'LUK' and tur in (None, tid):  # ogsaa uden aktiv tur
             laag.flyt(SERVO_LUKKET)
             net.send('R', 'LUK', vigtig=True)
             tur, pak = None, False
@@ -261,8 +233,8 @@ def main():
                     print('# %s har meldt sig' % fra)
                 if fra != 'R':
                     continue
-                if typ == 'EV':                    # bilens haendelse, med turens id
-                    print(','.join([d[0], tur or '-'] + d[1:]))
+                if typ == 'EV':
+                    print(','.join([d[0], tur or '-'] + d[1:]))  # med turens id
                     if d[0] == 'HOME':
                         tur = None
                 elif typ == 'TEMP':
@@ -272,7 +244,7 @@ def main():
                 elif typ == 'HALL?':
                     net.send('R', 'HALL', int(bil))
             laag.tik(nu)
-            while poll.poll(0):                    # serverens linje, et tegn ad gangen
+            while poll.poll(0):
                 c = sys.stdin.read(1)
                 if c not in '\r\n':
                     linje += c

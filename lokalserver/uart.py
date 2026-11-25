@@ -1,4 +1,3 @@
-"""Serial link to the base ESP32: read its lines and send commands (format in LAES_MIG.txt)."""
 import logging
 import re
 from threading import Condition, Lock
@@ -21,7 +20,6 @@ TEMPERATURE = re.compile(
 
 
 def read_frames(port, stop, accept):
-    """Collect bytes into lines of at most MAX_FRAME bytes and pass each line on."""
     frame = bytearray()
     discard = False
     while not stop.is_set():
@@ -43,7 +41,6 @@ def read_frames(port, stop, accept):
 
 
 def accept_frame(frame, event, temperature_callback=None):
-    """Handle one line. event(kind, trip, value) receives OK/NAK and the trip events."""
     measurement = TEMPERATURE.fullmatch(frame)
     if measurement is not None:
         value = float(measurement["celsius"])
@@ -66,7 +63,7 @@ def accept_frame(frame, event, temperature_callback=None):
         return
     match = EVENT.fullmatch(frame)
     if match is None:
-        LOG.info("UART not used: %r", frame)          # '#' text and events the server does not store
+        LOG.info("UART not used: %r", frame)
         return
     kind = match["kind"].decode("ascii")
     trip = UUID(match["trip"].decode("ascii"))
@@ -81,22 +78,21 @@ def accept_frame(frame, event, temperature_callback=None):
 
 
 class Base:
-    """Owns the serial port. run() reads and reopens the port; command() waits for OK/NAK."""
 
     def __init__(self, device, event, temperature_callback):
         self.device = device
         self.event = event
         self.temperature_callback = temperature_callback
         self.port = None
-        self.sending = Lock()                     # one command at a time
+        self.sending = Lock()
         self.answered = Condition()
-        self.replies = {}                         # trip -> None (OK) or the reason for NAK
+        self.replies = {}
 
     def run(self, stop):
         while not stop.is_set():
             port = Serial()
             port.port, port.baudrate, port.timeout = self.device, 115200, 0.2
-            port.dtr = port.rts = False               # set before open: do not reset the ESP32
+            port.dtr = port.rts = False  # do not reset the ESP32
             try:
                 port.open()
                 self.port = port
@@ -112,7 +108,7 @@ class Base:
     def accept(self, frame):
         try:
             accept_frame(frame, self.reply_or_event, self.temperature_callback)
-        except Exception:                             # one bad line must not stop the reader
+        except Exception:  # one bad line must not stop the reader
             LOG.exception("UART line failed: %r", frame)
 
     def reply_or_event(self, kind, trip, value):
@@ -124,8 +120,6 @@ class Base:
             self.event(kind, trip, value)
 
     def command(self, line, trip, timeout=3):
-        """Send one line, e.g. ORDER,<trip>,1, and wait for the base's answer to that trip.
-        Raises HTTPException unless the answer is OK."""
         with self.sending:
             port = self.port
             if port is None:

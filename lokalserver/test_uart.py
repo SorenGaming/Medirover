@@ -1,4 +1,3 @@
-"""The serial link without hardware: a fake port stands in for the base."""
 from threading import Event
 from uuid import uuid4
 
@@ -9,7 +8,6 @@ from uart import Base, accept_frame, read_frames
 
 
 class FakePort:
-    """Answers each command line like the base would."""
 
     def __init__(self, base, answer):
         self.base, self.answer, self.written = base, answer, []
@@ -27,7 +25,7 @@ def test_command_waits_for_ok_or_nak():
     trip = uuid4()
     with pytest.raises(HTTPException) as error:
         base.command(f"KLAR,{trip}", trip)
-    assert error.value.status_code == 503                     # no port yet
+    assert error.value.status_code == 503
 
     base.port = FakePort(base, "OK,{trip}\r\n")
     base.command(f"ORDER,{trip},1", trip)
@@ -38,11 +36,11 @@ def test_command_waits_for_ok_or_nak():
         base.command(f"ORDER,{trip},1", trip)
     assert error.value.status_code == 409 and error.value.detail.endswith("NOT_HOME")
 
-    base.port = FakePort(base, None)                          # the base says nothing
+    base.port = FakePort(base, None)
     with pytest.raises(HTTPException) as error:
         base.command(f"STOP,{trip}", trip, timeout=0.05)
     assert error.value.status_code == 504
-    assert events == []                                       # OK/NAK are answers, not events
+    assert events == []
 
 
 def test_events_and_lines_the_server_does_not_use():

@@ -1,7 +1,7 @@
 "use strict";
 const $ = id => document.getElementById(id);
 const statuses = {pending:"Pakkes",running:"Kører",delivered:"Afleveret",completed:"Hjemme",stopped:"Stoppet",cancelled:"Afbrudt",rejected:"Afvist"};
-// Knapperne til turen: hvilke statusser de kan bruges i (samme regler som serverens CONTROLS)
+// samme regler som CONTROLS i app.py
 const active = ["pending","running","delivered","stopped"];
 const buttons = {packed:["pending"], resume:["running","delivered"], stop:active, close:["stopped"]};
 const time = value => new Date(value).toLocaleString("da-DK");

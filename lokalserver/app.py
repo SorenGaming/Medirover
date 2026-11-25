@@ -1,4 +1,3 @@
-"""Medirover local server: orders, the base on USB/UART and the website."""
 import os
 from contextlib import asynccontextmanager
 from datetime import datetime
@@ -17,10 +16,9 @@ from uart import Base
 
 Station = Annotated[int, Field(strict=True, ge=1, le=2)]
 Status = Literal["pending", "running", "delivered", "completed", "stopped", "cancelled", "rejected"]
-ACTIVE = ("pending", "running", "delivered", "stopped")      # the rover is reserved
+ACTIVE = ("pending", "running", "delivered", "stopped")  # the rover is reserved
 COLUMNS = "request_id, station, status, last_error, created_at"
-# button -> (allowed statuses, command to the base, new status after OK)
-CONTROLS = {
+CONTROLS = {  # button: (allowed statuses, command, new status)
     "packed": (("pending",), "KLAR", None),
     "stop": (ACTIVE, "STOP", "stopped"),
     "resume": (("running", "delivered"), "FORTSAET", None),
@@ -92,7 +90,6 @@ def health():
 
 @app.post("/api/orders", response_model=Order, status_code=201, responses={200: {"model": Order}})
 def create_order(order: OrderInput, response: Response):
-    """Reserve the rover (one active trip) and send ORDER to the base. A NAK rejects the order."""
     try:
         with connect() as connection:
             saved = connection.execute(
@@ -108,7 +105,7 @@ def create_order(order: OrderInput, response: Response):
         raise HTTPException(409, "The rover already has an active trip") from None
     except (psycopg.OperationalError, psycopg.errors.UndefinedTable):
         raise HTTPException(503, "Database or order table unavailable") from None
-    if saved is None:                                  # the same order sent again
+    if saved is None:
         saved = get_order(order.request_id)
         if saved["station"] != order.station:
             raise HTTPException(409, "Request ID already used for another order")
@@ -139,7 +136,6 @@ def get_order(request_id: UUID):
 
 @app.post("/api/orders/{request_id}/{action}", response_model=Order)
 def control_order(request_id: UUID, action: Literal["packed", "stop", "resume", "close"]):
-    """The buttons on the website. The base must answer OK before the status changes."""
     allowed, command, target = CONTROLS[action]
     if get_order(request_id)["status"] not in allowed:
         raise HTTPException(409, f"Cannot {action} this trip now")
@@ -148,11 +144,10 @@ def control_order(request_id: UUID, action: Literal["packed", "stop", "resume", 
 
 
 def base_event(kind, request_id, value):
-    """Events from the base: STARTED -> running, ACK -> delivered, HOME -> completed."""
     if kind == "STARTED":
         change_order_status(request_id, ("pending",), "running")
     elif kind == "ACK":
-        change_order_status(request_id, ("running",), "delivered", int(value or 0))  # no station: refused
+        change_order_status(request_id, ("running",), "delivered", int(value or 0))
     elif kind == "HOME":
         change_order_status(request_id, ("running", "delivered"), "completed")
     elif kind == "ERR":
@@ -160,8 +155,6 @@ def base_event(kind, request_id, value):
 
 
 def change_order_status(request_id, expected, target, station=None, error=None):
-    """Move an order from one of the expected statuses to target (None keeps the status)
-    and set last_error (None clears it)."""
     try:
         with connect() as connection:
             saved = connection.execute(

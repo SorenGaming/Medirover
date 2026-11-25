@@ -1,10 +1,3 @@
-"""Medirover - STATION (KiCad Station 0.21). Gem som main.py. Station 2: ret NR til 2.
-
-LED 1 (roed) = bilen er her (Hall).  LED 2 blinker = laaget er aabent, tryk paa knappen.
-Knappen sender KVIT til bilen. LED 2 fast = kvitteret.  Kun LED 2 = leveret, laaget lukket.
-Alt slukker, naar bilen koerer.
-Ben: Hall GPIO4 (0 = magnet), knap GPIO13 (0 = trykket), LED 1 GPIO22, LED 2 GPIO21.
-"""
 from machine import Pin
 import time
 import gc
@@ -13,24 +6,20 @@ import espnow
 
 NR = 2
 
-# ---------- Radio: ESP-NOW (samme kode paa alle fire) ----------
 KANAL = 1
 BC = b'\xff' * 6
 
 
 class Net:
-    """Besked = tekst 'fra,til,type,data...'. Enhederne laerer hinandens MAC af foerste besked
-    (alle siger HEJ ved opstart). Kendt modtager: unicast. vigtig=True venter paa modtagerens
-    kvittering og proever op til 4 gange. Ukendt modtager: broadcast (til-feltet filtrerer)."""
 
     def __init__(self, navn):
         w = network.WLAN(network.STA_IF)
         try:
             w.active(True)
-        except OSError:                   # "WiFi Out of Memory": ryd op og proev igen
-            gc.collect()
+        except OSError:
+            gc.collect()  # WiFi Out of Memory
             w.active(True)
-        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):   # samme kanal, ingen stroemspar
+        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):  # stroemspar taber beskeder
             try:
                 w.config(**kw)
             except (OSError, ValueError, AttributeError):
@@ -69,23 +58,22 @@ class Net:
                 continue
             if len(d) < 3:
                 continue
-            if self.mac.get(d[0]) != mac:          # ny (eller genstartet) enhed: husk MAC
+            if self.mac.get(d[0]) != mac:
                 try:
                     self.e.add_peer(mac)
                 except OSError:
                     pass
                 self.mac[d[0]] = mac
                 if d[2] == 'HEJ':
-                    self.send(d[0], 'HEJ')         # svar, saa den ogsaa kender os
+                    self.send(d[0], 'HEJ')
             if d[1] == self.navn or d[1] == '*':
                 ud.append((d[0], d[2], d[3:]))
 
 
 class Indgang:
-    """Afprellet indgang: skifter foerst, naar ny vaerdi har vaeret stabil i ms[ny vaerdi]."""
 
     def __init__(self, gpio, ms0, ms1):
-        self.p = Pin(gpio, Pin.IN)                # eksterne modstande paa printet
+        self.p = Pin(gpio, Pin.IN)
         self.ms = (ms0, ms1)
         self.v = self.k = self.p.value()
         self.t = time.ticks_ms()
@@ -106,7 +94,7 @@ def main():
     led1 = Pin(22, Pin.OUT, value=0)
     led2 = Pin(21, Pin.OUT, value=0)
     bil = hall.v == 0
-    tilst = 'her' if bil else 'tom'           # tom, her, venter, kvit, leveret
+    tilst = 'her' if bil else 'tom'
     knap_foer = knap.v
     net.send('R', 'HALL', int(bil))
     print('Station', NR, 'klar:', tilst)
@@ -116,7 +104,7 @@ def main():
         if b != bil:
             bil = b
             net.send('R', 'HALL', int(b))
-            if tilst not in ('venter', 'kvit'):    # laaget er aabent: bilen koerer ikke
+            if tilst not in ('venter', 'kvit'):  # laaget er aabent
                 tilst = 'her' if b else 'tom'
             print('Hall:', b, '->', tilst)
         for fra, typ, d in net.modtag():

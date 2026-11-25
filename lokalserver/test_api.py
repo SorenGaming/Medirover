@@ -36,7 +36,6 @@ def test_invalid_orders(monkeypatch, payload):
 
 
 class FakeBase:
-    """Stands in for the base on USB: records each line and answers OK (or NAK if told to)."""
 
     def __init__(self):
         self.lines = []
@@ -70,7 +69,6 @@ def test_whole_trip_with_postgresql(monkeypatch):
                 monkeypatch.setattr(app_module, "base", base)
                 status = lambda trip: client.get(f"/api/orders/{trip}").json()["status"]
 
-                # order: reserves the rover and sends ORDER; the same order again changes nothing
                 trip = str(uuid4())
                 order = {"request_id": trip, "station": 1}
                 created = client.post("/api/orders", json=order)
@@ -82,7 +80,6 @@ def test_whole_trip_with_postgresql(monkeypatch):
                 assert client.get(f"/api/orders/{uuid4()}").status_code == 404
                 assert len(base.lines) == 1
 
-                # packed -> STARTED -> ACK (right station only) -> HOME
                 assert client.post(f"/api/orders/{trip}/resume").status_code == 409
                 assert client.post(f"/api/orders/{trip}/packed").json()["status"] == "pending"
                 assert base.lines[-1] == f"KLAR,{trip}"
@@ -99,14 +96,12 @@ def test_whole_trip_with_postgresql(monkeypatch):
                 base_event("HOME", UUID(trip), None)
                 assert status(trip) == "completed"
 
-                # the base refuses: the order is rejected and the rover is free again
                 base.refuse = "NOT_HOME"
                 refused = str(uuid4())
                 assert client.post("/api/orders", json={"request_id": refused, "station": 2}).status_code == 409
                 assert client.get(f"/api/orders/{refused}").json()["last_error"].endswith("NOT_HOME")
                 assert status(refused) == "rejected"
 
-                # stop and close
                 base.refuse = None
                 stopped = str(uuid4())
                 assert client.post("/api/orders", json={"request_id": stopped, "station": 2}).status_code == 201
@@ -116,7 +111,6 @@ def test_whole_trip_with_postgresql(monkeypatch):
                 assert client.post(f"/api/orders/{stopped}/close").json()["status"] == "cancelled"
                 assert base.lines[-2:] == [f"STOP,{stopped}", f"LUK,{stopped}"]
 
-                # two orders at the same time: only one gets the rover
                 with ThreadPoolExecutor(max_workers=2) as workers:
                     results = list(workers.map(
                         lambda station: client.post("/api/orders", json={"request_id": str(uuid4()), "station": station}),
