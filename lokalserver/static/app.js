@@ -109,6 +109,8 @@ $("apply-stats").addEventListener("click",()=>{if(!$("minimum").reportValidity()
 $("previous").addEventListener("click",()=>{offset=Math.max(0,offset-25);refresh();});
 $("next").addEventListener("click",()=>{offset+=25;refresh();});
 let trip = null, tripStatus = "", actionError = "";
+const fejltekst = {LID:"Bilens låg er åbent. Luk det og tryk Fortsæt.", LID_OPEN:"Basens låg er åbent. Luk det og bestil igen."};
+const tekst = s => fejltekst[String(s).split(" ").pop()] || s;
 async function loadTrip() {
   try {
     const newest = (await api("/api/orders?limit=1")).items[0];
@@ -116,7 +118,7 @@ async function loadTrip() {
     $("trip-state").textContent = trip ? statuses[trip.status] : "Bilen er ledig";
     $("order").disabled = $("order-station").disabled = trip !== null;
     for (const id in buttons) $(id).disabled = !trip || !buttons[id].includes(trip.status);
-    const error = actionError || (trip && trip.last_error ? `Fejl fra bilen: ${trip.last_error}` : "");
+    const error = actionError || (trip && trip.last_error ? `Fejl fra bilen: ${tekst(trip.last_error)}` : "");
     message("trip-message", error || (trip ? `Station ${trip.station} · tur ${trip.request_id}` : "Vælg station og tryk Bestil."), error ? "error" : "");
     if ((trip ? trip.status : "") !== tripStatus) { tripStatus = trip ? trip.status : ""; refresh(); }
   } catch (error) { message("trip-message", "Turen kunne ikke hentes.", "error"); }
@@ -126,7 +128,7 @@ async function post(path, body) {
   actionError = "";
   try {
     const response = await fetch(path, {method:"POST", headers:{"Content-Type":"application/json"}, body:JSON.stringify(body || {}), signal:AbortSignal.timeout(7000)});
-    if (!response.ok) actionError = `Ikke udført: ${(await response.json().catch(() => ({}))).detail || "HTTP " + response.status}`;
+    if (!response.ok) actionError = `Ikke udført: ${tekst((await response.json().catch(() => ({}))).detail || "HTTP " + response.status)}`;
   } catch (error) { actionError = "Ikke udført: ingen forbindelse til serveren."; }
   await loadTrip();
 }
