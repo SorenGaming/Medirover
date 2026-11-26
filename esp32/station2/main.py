@@ -11,15 +11,16 @@ BC = b'\xff' * 6
 
 
 class Net:
+    """ESP-NOW: broadcast til modtageren har sagt HEJ, derefter unicast med kvittering."""
 
     def __init__(self, navn):
         w = network.WLAN(network.STA_IF)
         try:
             w.active(True)
         except OSError:
-            gc.collect()  # WiFi Out of Memory
+            gc.collect()
             w.active(True)
-        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):  # stroemspar taber beskeder
+        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):
             try:
                 w.config(**kw)
             except (OSError, ValueError, AttributeError):
@@ -71,6 +72,7 @@ class Net:
 
 
 class Indgang:
+    """Afprellet indgang: en ny vaerdi gaelder foerst efter ms0/ms1 ms."""
 
     def __init__(self, gpio, ms0, ms1):
         self.p = Pin(gpio, Pin.IN)
@@ -104,7 +106,7 @@ def main():
         if b != bil:
             bil = b
             net.send('R', 'HALL', int(b))
-            if tilst not in ('venter', 'kvit'):  # laaget er aabent
+            if tilst not in ('venter', 'kvit'):
                 tilst = 'her' if b else 'tom'
             print('Hall:', b, '->', tilst)
         for fra, typ, d in net.modtag():

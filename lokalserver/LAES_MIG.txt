@@ -47,7 +47,7 @@ Server -> base. Basen svarer OK,<id> eller NAK,<id>,<grund> inden for 3 s.
   STOP,<id>         Stop. Bilen og lågene står stille
   FORTSAET,<id>     Fortsæt efter en fejl
   LUK,<id>          Afslut tur efter Stop. Lågene lukker
-  NAK-grunde: BUSY, NOT_HOME, NO_ROVER, WRONG_TRIP, BAD
+  NAK-grunde: BUSY, NOT_HOME, LID_OPEN, NO_ROVER, WRONG_TRIP, BAD
 
 Base -> server. Kun disse gemmes:
   STARTED,<id>,<st>   pending   -> running

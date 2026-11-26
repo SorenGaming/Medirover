@@ -6,29 +6,29 @@ import espnow
 import dht
 from neopixel import NeoPixel
 
-SERVO_AABEN, SERVO_LUKKET = 1030, 2005  # us
-PPC = 26.7  # pulser/cm
-IR_AKSEL = 21  # cm
+SERVO_AABEN, SERVO_LUKKET = 1030, 2005
+PPC = 26.7
+IR_AKSEL = 21
 
-MIN_V, MIN_H = 22.6, 24.6  # autotune 23/11
+MIN_V, MIN_H = 22.6, 24.6
 KF_V, KF_H = 0.0506, 0.0581
 KP, KI = 0.0358, 0.061
 LKP, LKD = 0.25, 0.06
 DREJ90_MAKS, DREJ180_MAKS = 36, 67
 
-FART, DREJFART, KRYBFART = 350, 160, 120  # pulser/s
+FART, DREJFART, KRYBFART = 350, 160, 120
 I_MAKS, LMAKS = 40, 0.5
 BREMSE_MS = 150
 BOOST_RATE, BOOST_MAKS = 40, 30
-BAK, LIGEUD, KRYB, TABT = 10, 5, 4, 6  # cm
+BAK, LIGEUD, KRYB, TABT = 10, 5, 4, 6
 MARK_VINDUE, MARK_PAUSE, MARK_PAUSE_DREJ = 2, 4, 12
 HVID_MIN = 0.4
 RET_CM, SOEG_CM = 8, 10
 DREJ_MIN_180, DREJ_MIN_90 = 0.54, 0.42
 START_FART, LMAKS_START = 0.6, 0.8
 FORHINDRING, FRI, FRI_MS = 15, 20, 1000
-FORHINDRING_STOP, FRI_STOP = 6, 8  # cm: stationen staar 10 cm fra stregen
-RUTER = {'B1': 'VS', 'B2': 'LHS', '1B': 'HS', '2B': 'VLS'}  # V/H drej, L ligeud, S stop
+FORHINDRING_STOP, FRI_STOP = 6, 8
+RUTER = {'B1': 'VS', 'B2': 'LHS', '1B': 'HS', '2B': 'VLS'}
 NEO_LYS = 30
 FARVER = {'klar': (0, 0, 255), 'pak': (0, 200, 200), 'koer': (0, 255, 0),
           'forhindring': (255, 90, 0), 'hall': (255, 200, 0), 'venter': (160, 0, 255),
@@ -39,15 +39,16 @@ BC = b'\xff' * 6
 
 
 class Net:
+    """ESP-NOW: broadcast til modtageren har sagt HEJ, derefter unicast med kvittering."""
 
     def __init__(self, navn):
         w = network.WLAN(network.STA_IF)
         try:
             w.active(True)
         except OSError:
-            gc.collect()  # WiFi Out of Memory
+            gc.collect()
             w.active(True)
-        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):  # stroemspar taber beskeder
+        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):
             try:
                 w.config(**kw)
             except (OSError, ValueError, AttributeError):
@@ -103,9 +104,10 @@ SERVO_FIL = 'laag_us.txt'
 
 
 class Servo:
+    """Skaansom servo: smaa trin naer enderne, slippes i lukket stilling."""
 
     def __init__(self, aaben, lukket):
-        self.aaben, self.lukket = aaben, lukket
+        self.lukket = lukket
         self.lav, self.hoej = min(aaben, lukket), max(aaben, lukket)
         Pin(SERVO_GPIO, Pin.OUT, value=0)
         self.pwm = None
@@ -131,7 +133,7 @@ class Servo:
     def _puls(self):
         d = self.us * 65535 // 20000
         if self.pwm is None:
-            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)  # duty fra start, ellers 50 % puls
+            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)
         else:
             self.pwm.duty_u16(d)
         self.holder = True
@@ -164,7 +166,7 @@ class Servo:
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:
             self._gem()
-        if self.us == self.maal == self.lukket:  # lukket: slip
+        if self.us == self.maal == self.lukket:
             self.pwm.duty_u16(0)
             self.holder = False
 
@@ -189,17 +191,18 @@ class Afbrudt(Exception):
 
 
 class Hjul:
+    """Et hjul: PI-regulering af pulser/s med feedforward."""
 
-    def __init__(self, in1, in2, enc, omvendt, navn):
+    def __init__(self, in1, in2, enc, omvendt, d0, kf):
         self.a = PWM(Pin(in1), freq=1000, duty_u16=0)
         self.b = PWM(Pin(in2), freq=1000, duty_u16=0)
         self.omv = omvendt
-        self.navn = navn
+        self.d0, self.kf = d0, kf
         self.n = self.sidst = self.maal = 0
         self.pps = self.i = self.boost = 0.0
         self.bremse_til = time.ticks_ms()
         self.enc = Pin(enc, Pin.IN)
-        self.enc.irq(trigger=Pin.IRQ_RISING, handler=self._puls)  # ESP32: ingen hard=True
+        self.enc.irq(trigger=Pin.IRQ_RISING, handler=self._puls)
 
     def _puls(self, p):
         self.n += 1
@@ -220,14 +223,13 @@ class Hjul:
             return
         m = abs(self.maal)
         fejl = m - self.pps
-        if abs(fejl) < 0.3 * m:  # I kun naer maalet
+        if abs(fejl) < 0.3 * m:
             self.i = max(-I_MAKS, min(I_MAKS, self.i + KI * fejl * dt / 1000))
-        if self.pps < 0.15 * m:  # staar fast: boost
+        if self.pps < 0.15 * m:
             self.boost = min(BOOST_MAKS, self.boost + BOOST_RATE * dt / 1000)
         else:
             self.boost = max(0.0, self.boost - 3 * BOOST_RATE * dt / 1000)
-        d0, kf = (MIN_V, KF_V) if self.navn == 'V' else (MIN_H, KF_H)
-        duty = max(0.0, min(100.0, d0 + kf * m + KP * fejl + self.i + self.boost))
+        duty = max(0.0, min(100.0, self.d0 + self.kf * m + KP * fejl + self.i + self.boost))
         self._pwm(duty if self.maal > 0 else -duty)
 
     def _pwm(self, p):
@@ -238,8 +240,9 @@ class Hjul:
         self.b.duty_u16(d if p < 0 else 0)
 
     def stop(self):
+        """Bremser med begge indgange hoeje i BREMSE_MS."""
         if self.maal != 0 or self.pps > 20:
-            self.a.duty_u16(65535)  # begge hoeje = bremse
+            self.a.duty_u16(65535)
             self.b.duty_u16(65535)
             self.bremse_til = time.ticks_add(time.ticks_ms(), BREMSE_MS)
         elif time.ticks_diff(self.bremse_til, time.ticks_ms()) <= 0:
@@ -250,8 +253,8 @@ class Hjul:
 
 class Bil:
     def __init__(self):
-        self.V = Hjul(16, 17, 33, False, 'V')
-        self.H = Hjul(26, 27, 35, True, 'H')
+        self.V = Hjul(16, 17, 33, False, MIN_V, KF_V)
+        self.H = Hjul(26, 27, 35, True, MIN_H, KF_H)
         self.irp = [Pin(g, Pin.IN) for g in (39, 34, 36)]
         self.usp = [(Pin(21, Pin.OUT, value=0), Pin(22, Pin.IN)), (Pin(4, Pin.OUT, value=0), Pin(19, Pin.IN))]
         self.usi = 0
@@ -263,8 +266,9 @@ class Bil:
         self.dht = dht.DHT11(Pin(14))
         self.net = Net('R')
         self.laag = Servo(SERVO_AABEN, SERVO_LUKKET)
+        self.kontakt = Pin(13, Pin.IN)
         nu = time.ticks_ms()
-        self.t_reg = self.t_us = self.t_neo = self.sidst_taet = nu
+        self.t_reg = self.t_us = self.t_neo = self.sidst_taet = self.t_kontakt = nu
         self.t_temp = time.ticks_add(nu, -30000)
         self.lys = 'klar'
         self.hall = {}
@@ -295,6 +299,7 @@ class Bil:
         self.H.stop()
 
     def tik(self, afbryd=True):
+        """Hovedloekken: radio, regulering, servo, ultralyd, LED og temperatur."""
         nu = time.ticks_ms()
         for fra, typ, d in self.net.modtag():
             self.besked(fra, typ, d)
@@ -381,15 +386,21 @@ class Bil:
     def laag_til(self, us, navn):
         self.laag.flyt(us)
         self.vent_paa(lambda: not self.laag.bevaeger())
+        self.t_kontakt = time.ticks_ms()
         self.ev('LID', 'R', navn)
 
     def sikkerhed(self, frem):
+        """Krav 2 og 3: koer kun med lukket laag, og stop for forhindringer."""
         if frem and not self.us_til:
             self.taet = [0, 0]
         self.us_til = frem
-        if not self.laag.er(SERVO_LUKKET):  # krav 3: koer kun med lukket laag
+        if not self.laag.er(SERVO_LUKKET):
             self.stop_motorer()
             self.laag_til(SERVO_LUKKET, 'CLOSED')
+        if self.kontakt.value() == 0:
+            self.t_kontakt = time.ticks_ms()
+        elif time.ticks_diff(time.ticks_ms(), self.t_kontakt) > 300:
+            raise Fejl('laagkontakten melder aabent', 'LID')
         if frem and max(self.taet) >= 2:
             self.stop_motorer()
             lys, self.lys = self.lys, 'forhindring'
@@ -413,12 +424,12 @@ class Bil:
             self.vent(150)
 
     def drej(self, retning, maks, min_andel):
+        """Drejer til midter-IR har forladt linjen og fundet den naeste."""
         r = -1 if retning == 'V' else 1
         mindst = min_andel * maks * PPC
         start = self.afstand()
         hvid = None
         forladt = False
-        n = sorte = 0
         while True:
             self.sikkerhed(False)
             self.V.saet(r * DREJFART)
@@ -426,8 +437,6 @@ class Bil:
             self.tik()
             c = self.ir()[1]
             d = self.afstand() - start
-            n += 1
-            sorte += c
             if not forladt:
                 if c:
                     hvid = None
@@ -435,14 +444,14 @@ class Bil:
                     hvid = d
                 elif d - hvid >= HVID_MIN * PPC:
                     forladt = True
-            elif c and d >= mindst:  # min. vinkel: ikke en naerliggende linje
+            elif c and d >= mindst:
                 break
             if d > maks * PPC:
                 self.stop_motorer()
-                raise Fejl('fandt ikke linjen i drejet (midt sort i %d af %d maalinger)' % (sorte, n), 'TURN')
+                raise Fejl('fandt ikke linjen i drejet', 'TURN')
         self.stop_motorer()
         self.vent(150)
-        self.find_linjen(-r, RET_CM)  # bremset forbi tapen
+        self.find_linjen(-r, RET_CM)
 
     def find_linjen(self, r, maks):
         start = self.afstand()
@@ -467,6 +476,7 @@ class Bil:
         return False
 
     def foelg(self):
+        """Linjefoelger med PD-styring. Udfoerer ruten ved hvert kryds."""
         self.lys = 'koer'
         e_f = side = 0.0
         tabt = None
@@ -486,11 +496,10 @@ class Bil:
                 sort_v = d
             if h:
                 sort_h = d
-            if (c and d - sidst >= pause and d - sort_v <= MARK_VINDUE * PPC  # kryds: V, M og H sorte
+            if (c and d - sidst >= pause and d - sort_v <= MARK_VINDUE * PPC
                     and d - sort_h <= MARK_VINDUE * PPC):
                 a, self.rute = self.rute[0], self.rute[1:]
-                self.st('kryds: ' + {'V': 'drejer venstre', 'H': 'drejer hoejre',
-                                     'L': 'ligeud', 'S': 'stopstreg'}[a])
+                self.st('kryds: ' + a)
                 if a == 'S':
                     self.stop_motorer()
                     self.vent(200)
@@ -539,7 +548,8 @@ class Bil:
             self.H.saet(vh)
             time.sleep_ms(1)
 
-    def hall_ok(self, navn):  # krav 3
+    def hall_ok(self, navn):
+        """Krav 3: Hall skal bekraefte, at bilen holder ved det rigtige sted."""
         self.lys = 'hall'
         self.stop_motorer()
         self.net.send(navn, 'HALL?')
@@ -564,6 +574,7 @@ class Bil:
         self.ev('HALL', navn[1] if navn != 'B' else '0')
 
     def forsoeg(self, fn, *a):
+        """Koerer fn igen efter en fejl, naar der trykkes Fortsaet."""
         while True:
             try:
                 return fn(*a)

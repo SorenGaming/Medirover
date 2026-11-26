@@ -6,22 +6,23 @@ import select
 import network
 import espnow
 
-SERVO_AABEN, SERVO_LUKKET = 1075, 2050  # us
+SERVO_AABEN, SERVO_LUKKET = 1075, 2050
 
 KANAL = 1
 BC = b'\xff' * 6
 
 
 class Net:
+    """ESP-NOW: broadcast til modtageren har sagt HEJ, derefter unicast med kvittering."""
 
     def __init__(self, navn):
         w = network.WLAN(network.STA_IF)
         try:
             w.active(True)
         except OSError:
-            gc.collect()  # WiFi Out of Memory
+            gc.collect()
             w.active(True)
-        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):  # stroemspar taber beskeder
+        for kw in ({'channel': KANAL}, {'pm': getattr(w, 'PM_NONE', 0)}):
             try:
                 w.config(**kw)
             except (OSError, ValueError, AttributeError):
@@ -77,9 +78,10 @@ SERVO_FIL = 'laag_us.txt'
 
 
 class Servo:
+    """Skaansom servo: smaa trin naer enderne, slippes i lukket stilling."""
 
     def __init__(self, aaben, lukket):
-        self.aaben, self.lukket = aaben, lukket
+        self.lukket = lukket
         self.lav, self.hoej = min(aaben, lukket), max(aaben, lukket)
         Pin(SERVO_GPIO, Pin.OUT, value=0)
         self.pwm = None
@@ -105,7 +107,7 @@ class Servo:
     def _puls(self):
         d = self.us * 65535 // 20000
         if self.pwm is None:
-            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)  # duty fra start, ellers 50 % puls
+            self.pwm = PWM(Pin(SERVO_GPIO), freq=50, duty_u16=d)
         else:
             self.pwm.duty_u16(d)
         self.holder = True
@@ -138,7 +140,7 @@ class Servo:
         self._puls()
         if self.us == self.maal or abs(self.us - self.gemt) >= 50:
             self._gem()
-        if self.us == self.maal == self.lukket:  # lukket: slip
+        if self.us == self.maal == self.lukket:
             self.pwm.duty_u16(0)
             self.holder = False
 
@@ -153,6 +155,7 @@ class Servo:
 
 
 class Indgang:
+    """Afprellet indgang: en ny vaerdi gaelder foerst efter ms0/ms1 ms."""
 
     def __init__(self, gpio, ms0, ms1):
         self.p = Pin(gpio, Pin.IN)
@@ -172,6 +175,7 @@ class Indgang:
 def main():
     net = Net('B')
     hall = Indgang(4, 200, 1000)
+    kontakt = Indgang(13, 50, 300)
     laag = Servo(SERVO_AABEN, SERVO_LUKKET)
     poll = select.poll()
     poll.register(sys.stdin, select.POLLIN)
@@ -185,9 +189,10 @@ def main():
     net.send('R', 'HALL', int(bil))
 
     def kommando(k, tid, a):
+        """Udfoerer en serverkommando. Returnerer None (OK) eller NAK-grunden."""
         nonlocal tur, pak
         if k == 'ORDER':
-            if tur == tid:  # samme ordre igen
+            if tur == tid:
                 return None
             if tur:
                 return 'BUSY'
@@ -195,11 +200,13 @@ def main():
                 return 'BAD'
             if not bil:
                 return 'NOT_HOME'
+            if kontakt.v:
+                return 'LID_OPEN'
             if not net.send('R', 'BESTIL', a, vigtig=True):
                 return 'NO_ROVER'
             tur, pak = tid, True
             laag.flyt(SERVO_AABEN)
-        elif k == 'LUK' and tur in (None, tid):  # ogsaa uden aktiv tur
+        elif k == 'LUK' and tur in (None, tid):
             laag.flyt(SERVO_LUKKET)
             net.send('R', 'LUK', vigtig=True)
             tur, pak = None, False
@@ -234,7 +241,7 @@ def main():
                 if fra != 'R':
                     continue
                 if typ == 'EV':
-                    print(','.join([d[0], tur or '-'] + d[1:]))  # med turens id
+                    print(','.join([d[0], tur or '-'] + d[1:]))
                     if d[0] == 'HOME':
                         tur = None
                 elif typ == 'TEMP':
@@ -244,6 +251,9 @@ def main():
                 elif typ == 'HALL?':
                     net.send('R', 'HALL', int(bil))
             laag.tik(nu)
+            k = kontakt.v
+            if kontakt.opdater(nu) != k:
+                print('LID,%s,B,%s' % (tur or '-', 'OPEN' if kontakt.v else 'CLOSED'))
             while poll.poll(0):
                 c = sys.stdin.read(1)
                 if c not in '\r\n':
