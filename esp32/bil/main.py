@@ -263,8 +263,9 @@ class Bil:
         self.dht = dht.DHT11(Pin(14))
         self.net = Net('R')
         self.laag = Servo(SERVO_AABEN, SERVO_LUKKET)
+        self.kontakt = Pin(13, Pin.IN)
         nu = time.ticks_ms()
-        self.t_reg = self.t_us = self.t_neo = self.sidst_taet = nu
+        self.t_reg = self.t_us = self.t_neo = self.sidst_taet = self.t_kontakt = nu
         self.t_temp = time.ticks_add(nu, -30000)
         self.lys = 'klar'
         self.hall = {}
@@ -381,6 +382,7 @@ class Bil:
     def laag_til(self, us, navn):
         self.laag.flyt(us)
         self.vent_paa(lambda: not self.laag.bevaeger())
+        self.t_kontakt = time.ticks_ms()
         self.ev('LID', 'R', navn)
 
     def sikkerhed(self, frem):
@@ -390,6 +392,10 @@ class Bil:
         if not self.laag.er(SERVO_LUKKET):  # krav 3: koer kun med lukket laag
             self.stop_motorer()
             self.laag_til(SERVO_LUKKET, 'CLOSED')
+        if self.kontakt.value() == 0:
+            self.t_kontakt = time.ticks_ms()
+        elif time.ticks_diff(time.ticks_ms(), self.t_kontakt) > 300:
+            raise Fejl('laagkontakten melder aabent', 'LID')
         if frem and max(self.taet) >= 2:
             self.stop_motorer()
             lys, self.lys = self.lys, 'forhindring'

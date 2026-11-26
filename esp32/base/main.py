@@ -172,6 +172,7 @@ class Indgang:
 def main():
     net = Net('B')
     hall = Indgang(4, 200, 1000)
+    kontakt = Indgang(13, 50, 300)
     laag = Servo(SERVO_AABEN, SERVO_LUKKET)
     poll = select.poll()
     poll.register(sys.stdin, select.POLLIN)
@@ -195,6 +196,8 @@ def main():
                 return 'BAD'
             if not bil:
                 return 'NOT_HOME'
+            if kontakt.v:
+                return 'LID_OPEN'
             if not net.send('R', 'BESTIL', a, vigtig=True):
                 return 'NO_ROVER'
             tur, pak = tid, True
@@ -244,6 +247,9 @@ def main():
                 elif typ == 'HALL?':
                     net.send('R', 'HALL', int(bil))
             laag.tik(nu)
+            k = kontakt.v
+            if kontakt.opdater(nu) != k:
+                print('LID,%s,B,%s' % (tur or '-', 'OPEN' if kontakt.v else 'CLOSED'))
             while poll.poll(0):
                 c = sys.stdin.read(1)
                 if c not in '\r\n':
