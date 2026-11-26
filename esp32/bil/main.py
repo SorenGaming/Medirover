@@ -105,7 +105,7 @@ SERVO_FIL = 'laag_us.txt'
 class Servo:
 
     def __init__(self, aaben, lukket):
-        self.aaben, self.lukket = aaben, lukket
+        self.lukket = lukket
         self.lav, self.hoej = min(aaben, lukket), max(aaben, lukket)
         Pin(SERVO_GPIO, Pin.OUT, value=0)
         self.pwm = None
@@ -190,11 +190,11 @@ class Afbrudt(Exception):
 
 class Hjul:
 
-    def __init__(self, in1, in2, enc, omvendt, navn):
+    def __init__(self, in1, in2, enc, omvendt, d0, kf):
         self.a = PWM(Pin(in1), freq=1000, duty_u16=0)
         self.b = PWM(Pin(in2), freq=1000, duty_u16=0)
         self.omv = omvendt
-        self.navn = navn
+        self.d0, self.kf = d0, kf
         self.n = self.sidst = self.maal = 0
         self.pps = self.i = self.boost = 0.0
         self.bremse_til = time.ticks_ms()
@@ -226,8 +226,7 @@ class Hjul:
             self.boost = min(BOOST_MAKS, self.boost + BOOST_RATE * dt / 1000)
         else:
             self.boost = max(0.0, self.boost - 3 * BOOST_RATE * dt / 1000)
-        d0, kf = (MIN_V, KF_V) if self.navn == 'V' else (MIN_H, KF_H)
-        duty = max(0.0, min(100.0, d0 + kf * m + KP * fejl + self.i + self.boost))
+        duty = max(0.0, min(100.0, self.d0 + self.kf * m + KP * fejl + self.i + self.boost))
         self._pwm(duty if self.maal > 0 else -duty)
 
     def _pwm(self, p):
@@ -250,8 +249,8 @@ class Hjul:
 
 class Bil:
     def __init__(self):
-        self.V = Hjul(16, 17, 33, False, 'V')
-        self.H = Hjul(26, 27, 35, True, 'H')
+        self.V = Hjul(16, 17, 33, False, MIN_V, KF_V)
+        self.H = Hjul(26, 27, 35, True, MIN_H, KF_H)
         self.irp = [Pin(g, Pin.IN) for g in (39, 34, 36)]
         self.usp = [(Pin(21, Pin.OUT, value=0), Pin(22, Pin.IN)), (Pin(4, Pin.OUT, value=0), Pin(19, Pin.IN))]
         self.usi = 0
@@ -424,7 +423,6 @@ class Bil:
         start = self.afstand()
         hvid = None
         forladt = False
-        n = sorte = 0
         while True:
             self.sikkerhed(False)
             self.V.saet(r * DREJFART)
@@ -432,8 +430,6 @@ class Bil:
             self.tik()
             c = self.ir()[1]
             d = self.afstand() - start
-            n += 1
-            sorte += c
             if not forladt:
                 if c:
                     hvid = None
@@ -445,7 +441,7 @@ class Bil:
                 break
             if d > maks * PPC:
                 self.stop_motorer()
-                raise Fejl('fandt ikke linjen i drejet (midt sort i %d af %d maalinger)' % (sorte, n), 'TURN')
+                raise Fejl('fandt ikke linjen i drejet', 'TURN')
         self.stop_motorer()
         self.vent(150)
         self.find_linjen(-r, RET_CM)  # bremset forbi tapen
@@ -495,8 +491,7 @@ class Bil:
             if (c and d - sidst >= pause and d - sort_v <= MARK_VINDUE * PPC  # kryds: V, M og H sorte
                     and d - sort_h <= MARK_VINDUE * PPC):
                 a, self.rute = self.rute[0], self.rute[1:]
-                self.st('kryds: ' + {'V': 'drejer venstre', 'H': 'drejer hoejre',
-                                     'L': 'ligeud', 'S': 'stopstreg'}[a])
+                self.st('kryds: ' + a)
                 if a == 'S':
                     self.stop_motorer()
                     self.vent(200)

@@ -79,7 +79,7 @@ SERVO_FIL = 'laag_us.txt'
 class Servo:
 
     def __init__(self, aaben, lukket):
-        self.aaben, self.lukket = aaben, lukket
+        self.lukket = lukket
         self.lav, self.hoej = min(aaben, lukket), max(aaben, lukket)
         Pin(SERVO_GPIO, Pin.OUT, value=0)
         self.pwm = None
