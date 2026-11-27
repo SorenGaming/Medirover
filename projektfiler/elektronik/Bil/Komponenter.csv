@@ -1,0 +1,89 @@
+﻿Reference;Værdi;Symbol;Side;Status;DNP
+C101;470u / 16V;Medirover:C_Polarized_Compact;Bil;Valgt / bestykning kontrolleres;no
+C201;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C202;100u / 10V;Medirover:C_Polarized_Compact;Bil;Valgt / bestykning kontrolleres;no
+C203;100n / 10V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C204;10u / 10V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C301;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C302;10u / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C304;100n / 50V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C305;100n / 50V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C310;100n / 10V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C311;100n / 10V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C312;1u / 16V;Medirover:C_Compact;Bil;Forsinker OE ved opstart. Kontrollér opstart med begge powerbanks.;no
+C401;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C402;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C403;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C420;100n;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C421;100n;Medirover:C_Compact;Bil;Lokal afkobling ved endstopprint.;no
+C440;100n;Medirover:C_Compact;Bil;Lokal keramisk afkobling ved ultralydsmodul.;no
+C441;10u / 10V;Medirover:C_Polarized_Compact;Bil;"Lokal bulk ved ultralydsmodul; kontroller polaritet.";no
+C442;100n;Medirover:C_Compact;Bil;Lokal keramisk afkobling ved ultralydsmodul.;no
+C443;10u / 10V;Medirover:C_Polarized_Compact;Bil;"Lokal bulk ved ultralydsmodul; kontroller polaritet.";no
+C501;470u / 10V;Medirover:C_Polarized_Compact;Bil;Valgt / bestykning kontrolleres;no
+C502;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C520;1000u / 10V;Medirover:C_Polarized_Compact;Bil;Valgt / bestykning kontrolleres;no
+C523;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C530;100n / 16V;Medirover:C_Compact;Bil;Valgt / bestykning kontrolleres;no
+C531;100n / 25V;Medirover:C_Compact;Bil;"Medtaget foreløbigt efter brugerens valg; grenens strøm og egnethed afprøves.";no
+C532;100u / 25V;Medirover:C_Polarized_Compact;Bil;"Afkobling over blæserforsyning; polaritet kontrolleres.";no
+D501;Status / ca. 2 mA;Medirover:LED_Compact;Bil;Valgt / bestykning kontrolleres;no
+D502;1N5819;Medirover:1N5819;Bil;Gennemføringsdel til hulprint.;no
+D510;Front: 12 x RGB -> hvid;Medirover:WS2812B_ring_12;Bil;Valgt af bruger;no
+D511;Bag: 12 x RGB -> rød;Medirover:WS2812B_ring_12;Bil;Valgt af bruger;no
+J101;USB-C breakout / NB10000 Gen 3;Medirover:USB_C_Receptacle_USB2.0_16P_Compact;Bil;Brugerens USB-C breakout til VIN. VBUS 5 V og fælles GND. Præcis terminalrækkefølge og eventuelle indbyggede Rd kontrolleres.;no
+J102;USB-C breakout / NB10000 Gen 1;Medirover:USB_C_Receptacle_USB2.0_16P_Compact;Bil;Brugerens USB-C breakout til VIN. VBUS 5 V og fælles GND. Præcis terminalrækkefølge og eventuelle indbyggede Rd kontrolleres.;no
+JP302;Encoder 5 V / lukket;Medirover:Jumper_2_Closed_Compact;Bil;Montér jumper. TXS0108E og encoderens signalkreds bruger samme nominelle 5 V-kilde.;no
+M301;V: JGA25-371 / 6 V / 100 RPM;Medirover:JGA25_371_encoder;Bil;SKU-GS20173-05. Encoder 5 V, A/B via TXS0108E. Kontrollér pinout og pull-ups før tilslutning.;no
+M302;H: JGA25-371 / 6 V / 100 RPM;Medirover:JGA25_371_encoder;Bil;SKU-GS20173-05. Encoder 5 V, A/B via TXS0108E. Kontrollér pinout og pull-ups før tilslutning.;no
+M501;MG90S / lågeservo;Medirover:Servo_MG90S;Bil;"Valgt af bruger. 5 V; strøm og mekaniske endepunkter afprøves.";no
+M502;Usongshine / 12 V / 3010;Medirover:Blaeser_12V;Bil;"Usongshine 12 V, 2 ledere. 3010 (30 × 30 × 10 mm) oplyst af bruger. Designramme højst 0,20 A ved 12 V. Kontrollér mærkestrøm og startstrøm.";no
+R101;5k1 / 1%;Medirover:R_Compact;Bil;"Én Rd pr. CC-ben; indbygget på modtagerprint ELLER ekstern, ikke begge.";no
+R102;5k1 / 1%;Medirover:R_Compact;Bil;"Én Rd pr. CC-ben; indbygget på modtagerprint ELLER ekstern, ikke begge.";no
+R103;5k1 / 1%;Medirover:R_Compact;Bil;"Én Rd pr. CC-ben; indbygget på modtagerprint ELLER ekstern, ikke begge.";no
+R104;5k1 / 1%;Medirover:R_Compact;Bil;"Én Rd pr. CC-ben; indbygget på modtagerprint ELLER ekstern, ikke begge.";no
+R301;100R;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R302;100k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R303;100R;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R304;100k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R305;100R;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R306;100k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R307;100R;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R308;100k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R312;10k;Medirover:R_Compact;Bil;Oplader C312 efter opstart.;no
+R313;100k;Medirover:R_Compact;Bil;Holder OE lav ved opstart sammen med C312.;no
+R420;10k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R421;1k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R430;10k;Medirover:R_Compact;Bil;IR-udgang til spændingsdeler.;no
+R431;15k;Medirover:R_Compact;Bil;IR-spændingsdeler, nominelt 3,0 V ved 5 V.;no
+R432;10k;Medirover:R_Compact;Bil;IR-udgang til spændingsdeler.;no
+R433;15k;Medirover:R_Compact;Bil;IR-spændingsdeler, nominelt 3,0 V ved 5 V.;no
+R434;10k;Medirover:R_Compact;Bil;IR-udgang til spændingsdeler.;no
+R435;15k;Medirover:R_Compact;Bil;IR-spændingsdeler, nominelt 3,0 V ved 5 V.;no
+R440;1k;Medirover:R_Compact;Bil;"Trig-seriemodstand; 3,3 V-signal til HC-SR04.";no
+R441;100k;Medirover:R_Compact;Bil;Holder Trig lav ved reset.;no
+R442;10k / 1%;Medirover:R_Compact;Bil;Øvre modstand i Echo-spændingsdeler.;no
+R443;18k / 1%;Medirover:R_Compact;Bil;Nedre delermodstand: ca. 3,21 V ved 5 V Echo.;no
+R444;1k;Medirover:R_Compact;Bil;"Trig-seriemodstand; 3,3 V-signal til HC-SR04.";no
+R445;100k;Medirover:R_Compact;Bil;Holder Trig lav ved reset.;no
+R446;10k / 1%;Medirover:R_Compact;Bil;Øvre modstand i Echo-spændingsdeler.;no
+R447;18k / 1%;Medirover:R_Compact;Bil;Nedre delermodstand: ca. 3,21 V ved 5 V Echo.;no
+R501;1k;Medirover:R_Compact;Bil;Seriemodstand på direkte 3,3 V PWM fra ESP32.;no
+R502;100k;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R521;330R ved DI;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R522;680R;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R523;330R ved DI;Medirover:R_Compact;Bil;Valgt / bestykning kontrolleres;no
+R524;100k;Medirover:R_Compact;Bil;"GPIO2 pulldown; må ikke trækkes op under download/reset.";no
+SW101;Rocker / SPST / 2 ben;Medirover:SW_Rocker_SPST;Bil;Separat 5 V-gren. Krav: mindst 3 A ved 12 V DC. Kontrollér kontaktens DC-mærkning.;no
+SW102;Rocker / SPST / 2 ben;Medirover:SW_Rocker_SPST;Bil;Separat 5 V-gren. Krav: mindst 3 A ved 12 V DC. Kontrollér kontaktens DC-mærkning.;no
+SW401;Lågkontakt / S-G-V print;Medirover:Endstopprint_S_G_V;Bil;"Fotograferet mekanisk S/G/V-endstopprint. V=3,3 V, G=GND, S=signal. Aktiv lav er arbejdsantagelse; aktivniveau kontrolleres ved firmwaretest. Intet 5 V-signal til GPIO.";no
+U101;MT3608 / 5V -> 12V;Medirover:MT3608_modul;Bil;Fotograferet boostmodul. Indstil 12,0 V før blæser tilsluttes. Designramme højst 0,20 A ud / ca. 0,60 A ind ved 80 % virkningsgrad. IC-peakstrøm er ikke modullets udgangsstrøm.;no
+U201;ESP-32U / ekstern antenne / 38 ben;Medirover:ESP32_DevKit_38_External_Antenna;Bil;"Fotograferet ESP-32U, 38 ben. Headernavne matcher GPIO-planen. Ekstern 2,4 GHz-antenne; fabrikant/printrevision ikke verificeret.";no
+U301;MX1508 / PWM på IN1...IN4;Medirover:MX1508_modul;Bil;Bekræftet af bruger;no
+U312;TXS0108E modul;Medirover:TXS0108E_modul;Bil;YF08E breakout med 2 x 10 gennemføringsben. VA=3,3 V, VB=5 V. Hold signalledninger korte.;no
+U401;IR Tracker / digital;Medirover:IR_Tracker_3pin;Bil;Foto: bagside med ben nedad VCC-OUT-GND. Fabrikat ikke sikkert identificeret.;no
+U402;IR Tracker / digital;Medirover:IR_Tracker_3pin;Bil;Foto: bagside med ben nedad VCC-OUT-GND. Fabrikat ikke sikkert identificeret.;no
+U403;IR Tracker / digital;Medirover:IR_Tracker_3pin;Bil;Foto: bagside med ben nedad VCC-OUT-GND. Fabrikat ikke sikkert identificeret.;no
+U440;HC-SR04 / front venstre;Medirover:HC_SR04;Bil;"Brugerens HC-SR04. Trigger mindst 10 us; mål på skift med stilleperiode.";no
+U441;HC-SR04 / front højre;Medirover:HC_SR04;Bil;"Brugerens HC-SR04. Trigger mindst 10 us; mål på skift med stilleperiode.";no
+U501;DHT11 / lille sort modul;Medirover:DHT11_modul;Bil;5 V-modul. DATA går via TXS0108E kanal 5. Pull-up antages indbygget.;no

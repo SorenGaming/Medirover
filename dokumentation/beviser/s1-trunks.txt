@@ -1,0 +1,548 @@
+boot-end-marker
+!
+!
+!
+!
+no aaa new-model
+switch 1 provision ws-c3750g-24t
+system mtu routing 1500
+vtp mode transparent
+no ip domain-lookup
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 10
+ name BETJENING
+!
+vlan 20
+ name LOKALSERVER
+!
+vlan 30
+ name CENTRALSERVER
+!
+vlan 99
+ name MANAGEMENT_S1_R1
+!
+vlan 199
+ name MANAGEMENT_R2
+!
+vlan 998
+ name PARKERING
+!
+vlan 999
+ name NATIVE_UBRUGT
+!
+!
+!
+interface GigabitEthernet1/0/1
+ description TRUNK_TO_R1_G0_0
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,99
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface GigabitEthernet1/0/2
+ description WINDOWS_BETJENING
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/3
+ description UBUNTU_LOKALSERVER
+ switchport access vlan 20
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/4
+ description TRUNK_TO_R2_G0_0
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 30,199
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface GigabitEthernet1/0/5
+ description WINDOWS_CENTRAL
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/6
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/7
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/8
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/9
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/10
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/11
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/12
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/13
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/14
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/15
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/16
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/17
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/18
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/19
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/20
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/21
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/22
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/23
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/24
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan99
+ ip address 10.20.99.2 255.255.255.0
+!
+ip default-gateway 10.20.99.1
+ip classless
+no ip http server
+no ip http secure-server
+!
+!
+no vstack
+!
+line con 0
+line vty 5 15
+!
+end
+
+S1-MEDIROVER#show vlan brief
+
+VLAN Name                             Status    Ports
+---- -------------------------------- --------- -------------------------------
+1    default                          active    Gi1/0/1, Gi1/0/4
+10   BETJENING                        active    Gi1/0/2
+20   LOKALSERVER                      active    Gi1/0/3
+30   CENTRALSERVER                    active    Gi1/0/5
+99   MANAGEMENT_S1_R1                 active
+199  MANAGEMENT_R2                    active
+998  PARKERING                        active    Gi1/0/6, Gi1/0/7, Gi1/0/8
+                                                Gi1/0/9, Gi1/0/10, Gi1/0/11
+                                                Gi1/0/12, Gi1/0/13, Gi1/0/14
+                                                Gi1/0/15, Gi1/0/16, Gi1/0/17
+                                                Gi1/0/18, Gi1/0/19, Gi1/0/20
+                                                Gi1/0/21, Gi1/0/22, Gi1/0/23
+                                                Gi1/0/24
+999  NATIVE_UBRUGT                    active
+1002 fddi-default                     act/unsup
+1003 token-ring-default               act/unsup
+1004 fddinet-default                  act/unsup
+1005 trnet-default                    act/unsup
+S1-MEDIROVER#show interfaces status
+
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi1/0/1   TRUNK_TO_R1_G0_0   notconnect   trunk        auto   auto 10/100/1000BaseTX
+Gi1/0/2   WINDOWS_BETJENING  notconnect   10           auto   auto 10/100/1000BaseTX
+Gi1/0/3   UBUNTU_LOKALSERVER notconnect   20           auto   auto 10/100/1000BaseTX
+Gi1/0/4   TRUNK_TO_R2_G0_0   notconnect   trunk        auto   auto 10/100/1000BaseTX
+Gi1/0/5   WINDOWS_CENTRAL    notconnect   30           auto   auto 10/100/1000BaseTX
+Gi1/0/6                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/7                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/8                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/9                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/10                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/11                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/12                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/13                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/14                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/15                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/16                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/17                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/18                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/19                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/20                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/21                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/22                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/23                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/24                     disabled     998          auto   auto 10/100/1000BaseTX
+S1-MEDIROVER#
+S1-MEDIROVER#copy running-config startup-config
+Destination filename [startup-config]?
+Building configuration...
+[OK]
+0 bytes copied in 0.915 secs (0 bytes/sec)
+S1-MEDIROVER#show startup-config
+Using 3654 out of 524288 bytes
+!
+version 12.2
+no service pad
+service timestamps debug datetime msec
+service timestamps log datetime msec
+no service password-encryption
+!
+hostname S1-MEDIROVER
+!
+boot-start-marker
+boot-end-marker
+!
+!
+!
+!
+no aaa new-model
+switch 1 provision ws-c3750g-24t
+system mtu routing 1500
+vtp mode transparent
+no ip domain-lookup
+!
+!
+!
+!
+!
+!
+!
+!
+spanning-tree mode pvst
+spanning-tree extend system-id
+!
+vlan internal allocation policy ascending
+!
+vlan 10
+ name BETJENING
+!
+vlan 20
+ name LOKALSERVER
+!
+vlan 30
+ name CENTRALSERVER
+!
+vlan 99
+ name MANAGEMENT_S1_R1
+!
+vlan 199
+ name MANAGEMENT_R2
+!
+vlan 998
+ name PARKERING
+!
+vlan 999
+ name NATIVE_UBRUGT
+!
+!
+!
+interface GigabitEthernet1/0/1
+ description TRUNK_TO_R1_G0_0
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 10,20,99
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface GigabitEthernet1/0/2
+ description WINDOWS_BETJENING
+ switchport access vlan 10
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/3
+ description UBUNTU_LOKALSERVER
+ switchport access vlan 20
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/4
+ description TRUNK_TO_R2_G0_0
+ switchport trunk encapsulation dot1q
+ switchport trunk native vlan 999
+ switchport trunk allowed vlan 30,199
+ switchport mode trunk
+ switchport nonegotiate
+!
+interface GigabitEthernet1/0/5
+ description WINDOWS_CENTRAL
+ switchport access vlan 30
+ switchport mode access
+ spanning-tree portfast
+ spanning-tree bpduguard enable
+!
+interface GigabitEthernet1/0/6
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/7
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/8
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/9
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/10
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/11
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/12
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/13
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/14
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/15
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/16
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/17
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/18
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/19
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/20
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/21
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/22
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/23
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface GigabitEthernet1/0/24
+ switchport access vlan 998
+ switchport mode access
+ shutdown
+!
+interface Vlan1
+ no ip address
+ shutdown
+!
+interface Vlan99
+ ip address 10.20.99.2 255.255.255.0
+!
+ip default-gateway 10.20.99.1
+ip classless
+no ip http server
+no ip http secure-server
+!
+!
+no vstack
+!
+line con 0
+line vty 5 15
+!
+end
+
+S1-MEDIROVER#
+S1-MEDIROVER#
+*Mar  1 00:29:15.500: %LINK-3-UPDOWN: Interface GigabitEthernet1/0/4, changed state to up
+*Mar  1 00:29:16.507: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/4, changed state to up
+*Mar  1 00:30:25.260: %LINK-3-UPDOWN: Interface GigabitEthernet1/0/1, changed state to up
+*Mar  1 00:30:26.267: %LINEPROTO-5-UPDOWN: Line protocol on Interface GigabitEthernet1/0/1, changed state to up
+*Mar  1 00:30:53.286: %LINEPROTO-5-UPDOWN: Line protocol on Interface Vlan99, changed state to up
+S1-MEDIROVER#show interfaces status
+
+Port      Name               Status       Vlan       Duplex  Speed Type
+Gi1/0/1   TRUNK_TO_R1_G0_0   connected    trunk      a-full a-1000 10/100/1000BaseTX
+Gi1/0/2   WINDOWS_BETJENING  notconnect   10           auto   auto 10/100/1000BaseTX
+Gi1/0/3   UBUNTU_LOKALSERVER notconnect   20           auto   auto 10/100/1000BaseTX
+Gi1/0/4   TRUNK_TO_R2_G0_0   connected    trunk      a-full a-1000 10/100/1000BaseTX
+Gi1/0/5   WINDOWS_CENTRAL    notconnect   30           auto   auto 10/100/1000BaseTX
+Gi1/0/6                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/7                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/8                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/9                      disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/10                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/11                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/12                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/13                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/14                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/15                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/16                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/17                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/18                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/19                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/20                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/21                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/22                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/23                     disabled     998          auto   auto 10/100/1000BaseTX
+Gi1/0/24                     disabled     998          auto   auto 10/100/1000BaseTX
+S1-MEDIROVER#show interfaces trunk
+
+Port        Mode             Encapsulation  Status        Native vlan
+Gi1/0/1     on               802.1q         trunking      999
+Gi1/0/4     on               802.1q         trunking      999
+
+Port        Vlans allowed on trunk
+Gi1/0/1     10,20,99
+Gi1/0/4     30,199
+
+Port        Vlans allowed and active in management domain
+Gi1/0/1     10,20,99
+Gi1/0/4     30,199
+
+Port        Vlans in spanning tree forwarding state and not pruned
+Gi1/0/1     10,20,99
+Gi1/0/4     30,199
+S1-MEDIROVER#show ip interface brief
+Interface              IP-Address      OK? Method Status                Protocol
+Vlan1                  unassigned      YES manual administratively down down
+Vlan99                 10.20.99.2      YES manual up                    up
+GigabitEthernet1/0/1   unassigned      YES unset  up                    up
+GigabitEthernet1/0/2   unassigned      YES unset  down                  down
+GigabitEthernet1/0/3   unassigned      YES unset  down                  down
+GigabitEthernet1/0/4   unassigned      YES unset  up                    up
+GigabitEthernet1/0/5   unassigned      YES unset  down                  down
+GigabitEthernet1/0/6   unassigned      YES unset  administratively down down
+GigabitEthernet1/0/7   unassigned      YES unset  administratively down down
+GigabitEthernet1/0/8   unassigned      YES unset  administratively down down
+GigabitEthernet1/0/9   unassigned      YES unset  administratively down down
+GigabitEthernet1/0/10  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/11  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/12  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/13  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/14  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/15  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/16  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/17  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/18  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/19  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/20  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/21  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/22  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/23  unassigned      YES unset  administratively down down
+GigabitEthernet1/0/24  unassigned      YES unset  administratively down down
+S1-MEDIROVER#ping 10.20.99.1
+
+Type escape sequence to abort.
+Sending 5, 100-byte ICMP Echos to 10.20.99.1, timeout is 2 seconds:
+!!!!!
+Success rate is 100 percent (5/5), round-trip min/avg/max = 1/203/10

@@ -1,0 +1,15 @@
+﻿Reference;Værdi;Symbol;Side;Status;DNP
+C101;100n / 16V;Medirover:C_Compact;Station;Valgt / bestykning kontrolleres;no
+C102;100u / 10V;Medirover:C_Polarized_Compact;Station;Valgt / bestykning kontrolleres;no
+C103;100n / 10V;Medirover:C_Compact;Station;Valgt / bestykning kontrolleres;no
+C203;100n / 16V;Medirover:C_Compact;Station;Valgt / bestykning kontrolleres;no
+C210;100n / 10V;Medirover:C_Compact;Station;Valgt / bestykning kontrolleres;no
+C211;100n / 10V;Medirover:C_Compact;Station;Afkobling af 3,3 V ved knappens kabel.;no
+PS101;5 V DC / 1 A / 5 W*;Medirover:5V_DC_adapter;Station;"Brugerens 5 W-adapter behandles som reguleret 5 V DC / 1 A. Spænding og stikpolaritet er designantagelse, ikke fotoverificeret. Tilslut efter + og -; kontakt-/stiktype fastlægges ved montage.";no
+R201;4k7;Medirover:R_Compact;Station;Ekstern pull-up til 3,3 V efter fjernelse af R1 på Hall-modulet.;no
+R210;1k;Medirover:R_Compact;Station;Valgt / bestykning kontrolleres;no
+R211;10k / pull-up;Medirover:R_Compact;Station;Valgt / bestykning kontrolleres;no
+SW101;Afbryder;Medirover:SW_SPST_Compact;Station;Valgt / bestykning kontrolleres;no
+SW201;Trykknap / 4 ben / NO;Medirover:Taktil_4ben_NO;Station;"To internt forbundne benpar. Par identificeres med kontinuitet; normalt åben mellem par.";no
+U101;ESP-32D / DevKitC V4 / 38 ben;Medirover:ESP32_DevKitC_V4_WROOM32;Station;"38 ben fra ITT Lab/producentpinout; eksisterende kortmærkning verificeres";no
+U201;3144 Hall / aktiv lav;Medirover:Hall_3144EUA_S_modul;Station;Fjern R1 på modulet. Forsyn modulet med 5 V og træk S op til 3,3 V via R201.;no

@@ -1,0 +1,27 @@
+﻿Antal;Referencer;Komponent;Bemærkning
+1;D501;Status / ca. 2 mA;Valgt / bestykning kontrolleres
+1;D502;1N5819;Gennemføringsdel til hulprint.
+1;D510;Front: 12 x RGB -> hvid;Valgt af bruger
+1;D511;Bag: 12 x RGB -> rød;Valgt af bruger
+1;J101;USB-C breakout / NB10000 Gen 3;Brugerens USB-C breakout til VIN. VBUS 5 V og fælles GND. Præcis terminalrækkefølge og eventuelle indbyggede Rd kontrolleres.
+1;J102;USB-C breakout / NB10000 Gen 1;Brugerens USB-C breakout til VIN. VBUS 5 V og fælles GND. Præcis terminalrækkefølge og eventuelle indbyggede Rd kontrolleres.
+1;JP302;Encoder 5 V / lukket;Montér jumper. TXS0108E og encoderens signalkreds bruger samme nominelle 5 V-kilde.
+1;M301;V: JGA25-371 / 6 V / 100 RPM;SKU-GS20173-05. Encoder 5 V, A/B via TXS0108E. Kontrollér pinout og pull-ups før tilslutning.
+1;M302;H: JGA25-371 / 6 V / 100 RPM;SKU-GS20173-05. Encoder 5 V, A/B via TXS0108E. Kontrollér pinout og pull-ups før tilslutning.
+1;M501;MG90S / lågeservo;"Valgt af bruger. 5 V; strøm og mekaniske endepunkter afprøves."
+1;M502;Usongshine / 12 V / 3010;"Usongshine 12 V, 2 ledere. 3010 (30 × 30 × 10 mm) oplyst af bruger. Designramme højst 0,20 A ved 12 V. Kontrollér mærkestrøm og startstrøm."
+2;SW101, SW102;Rocker / SPST / 2 ben;Separat 5 V-gren. Krav: mindst 3 A ved 12 V DC. Kontrollér kontaktens DC-mærkning.
+1;SW401;Lågkontakt / S-G-V print;"Fotograferet mekanisk S/G/V-endstopprint. V=3,3 V, G=GND, S=signal. Aktiv lav er arbejdsantagelse; aktivniveau kontrolleres ved firmwaretest. Intet 5 V-signal til GPIO."
+1;U101;MT3608 / 5V -> 12V;Fotograferet boostmodul. Indstil 12,0 V før blæser tilsluttes. Designramme højst 0,20 A ud / ca. 0,60 A ind ved 80 % virkningsgrad. IC-peakstrøm er ikke modullets udgangsstrøm.
+1;U201;ESP-32U / ekstern antenne / 38 ben;"Fotograferet ESP-32U, 38 ben. Headernavne matcher GPIO-planen. Ekstern 2,4 GHz-antenne; fabrikant/printrevision ikke verificeret."
+1;U301;MX1508 / PWM på IN1...IN4;Bekræftet af bruger
+1;U312;TXS0108E modul;YF08E breakout med 2 x 10 gennemføringsben. VA=3,3 V, VB=5 V. Hold signalledninger korte.
+3;U401, U402, U403;IR Tracker / digital;Foto: bagside med ben nedad VCC-OUT-GND. Fabrikat ikke sikkert identificeret.
+1;U440;HC-SR04 / front venstre;"Brugerens HC-SR04. Trigger mindst 10 us; mål på skift med stilleperiode."
+1;U441;HC-SR04 / front højre;"Brugerens HC-SR04. Trigger mindst 10 us; mål på skift med stilleperiode."
+1;U501;DHT11 / lille sort modul;5 V-modul. DATA går via TXS0108E kanal 5. Pull-up antages indbygget.
+1;Ekstern;Nitecore NB10000 Gen 3;Til J101.
+1;Ekstern;Nitecore NB10000 Gen 1;Til J102.
+2;Ekstern;USB-C til USB-C, 3 A;Ét kort kabel pr. powerbank.
+1;Ekstern;2,4 GHz antenne med koaksialkabel;Med ESP-32U.
+1;Ekstern;Magnet til Hall-detektering;Monteres på bilen.

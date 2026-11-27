@@ -1,0 +1,13 @@
+U37 | Ubuntu / UFW-log, 19. november 2026
+Udvalgte felter fra journalctl. Pakkerne findes også i /var/log/ufw.log.
+
+ufw status verbose (uddrag)
+10.20.20.10 443/tcp on enx606d3ce5a9c0 ALLOW IN    10.20.10.10
+
+journalctl -k -b --no-pager -o short-iso (uddrag)
+2026-11-19T11:47:10+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=29612 PROTO=TCP SPT=56548 DPT=443
+2026-11-19T11:47:11+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=29613 PROTO=TCP SPT=56548 DPT=443
+2026-11-19T11:47:13+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=29614 PROTO=TCP SPT=56548 DPT=443

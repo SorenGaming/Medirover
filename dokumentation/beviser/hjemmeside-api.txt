@@ -1,0 +1,21 @@
+2026-11-25T16:29:06.6877337+01:00
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/net-test
+Medirover HTTPS virker
+
+HTTP 200
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/api/statistics?min_completed=1
+{"stations":[{"station":1,"orders":2,"pending":0,"running":0,"completed":1},{"station":2,"orders":2,"pending":0,"running":0,"completed":1}],"min_completed":1}
+HTTP 200
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/api/statistics?min_completed=2
+{"stations":[],"min_completed":2}
+HTTP 200
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/api/temperature
+{"temperature_c":23.0,"humidity_percent":10.0,"measured_at":"2026-11-25T16:24:12.027201+01:00","state":"stale","age_seconds":276}
+HTTP 200
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/api/orders?status=completed
+{"items":[{"request_id":"1fb3e266-1c1d-4b0b-b7d7-513e16978645","station":2,"status":"completed","last_error":null,"created_at":"2026-11-25T16:11:11.933598+01:00"},{"request_id":"2b8f5a46-1d4b-445b-8859-95d89ebc7ef0","station":1,"status":"completed","last_error":null,"created_at":"2026-11-25T15:53:57.354478+01:00"}],"total":2,"limit":25,"offset":0}
+HTTP 200
+PS> curl.exe --cacert <public cert> --write-out "HTTP status" https://10.20.20.10/static/backup-status.json
+{"last_success_at":"2026-11-25T15:36:01+01:00"}
+
+HTTP 200

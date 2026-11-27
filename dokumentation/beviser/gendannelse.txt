@@ -1,0 +1,31 @@
+2026-11-26T12:07:40.0163026+01:00
+Host: MIAAW
+Backup: medirover_demo-20261126T110017087Z.dump / 8416 bytes / SHA-256 2D148149CF4AF2BC61F8C451CE72235601E7B9B7AE7D13A165F5ED3B8598FBF4
+Existing PostgreSQL service before test: Running, PID 5376
+PS> pg_restore --data-only --table=medirover_orders --file=- <verified backup>
+PS> pg_restore --data-only --table=medirover_temperatures --file=- <verified backup>
+Expected counts parsed from the same backup before restore:
+orders|9
+measurements|241
+cancelled|4
+completed|4
+rejected|1
+PS> initdb --auth=scram-sha-256 --encoding=UTF8 (separate test cluster)
+PS> pg_ctl -w start (test cluster only, 127.0.0.1:55432)
+waiting for server to start.... done
+server started
+PS> createdb -h 127.0.0.1 -p 55432 -U restore_check medirover_restore_20261126
+PS> pg_restore -h 127.0.0.1 -p 55432 -U restore_check -d medirover_restore_20261126 --exit-on-error --single-transaction --no-owner --no-privileges <verified backup>
+PS> psql -X -A -t -c SELECT 'orders', count(*) FROM public.medirover_orders UNION ALL SELECT 'measurements', count(*) FROM public.medirover_temperatures;
+orders|9
+measurements|241
+PS> psql -X -A -t -c SELECT status,count(*) FROM public.medirover_orders GROUP BY status ORDER BY status;
+cancelled|4
+completed|4
+rejected|1
+MEDIROVER_RESTORE_COUNTS_MATCH
+PS> pg_ctl -m fast -w stop (test cluster only)
+waiting for server to shut down.... done
+server stopped
+Existing PostgreSQL service after test: Running, PID 5376
+MEDIROVER_RESTORE_OK

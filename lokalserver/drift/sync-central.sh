@@ -24,14 +24,14 @@ CREATE TEMP TABLE incoming_measurements (LIKE public.medirover_temperatures) ON 
 \copy incoming_orders (request_id, station, status, created_at, last_error) FROM 'orders.csv' CSV
 \copy incoming_measurements (id, temperature_c, measured_at, humidity_percent) FROM 'measurements.csv' CSV
 
--- Release the previous active slot before copying a new active trip.
+-- Afslut den tidligere aktive tur, før den næste kopieres.
 UPDATE public.medirover_orders AS saved SET status = incoming.status
 FROM incoming_orders AS incoming
 WHERE saved.request_id = incoming.request_id
   AND saved.status IN ('pending', 'running', 'delivered', 'stopped')
   AND incoming.status NOT IN ('pending', 'running', 'delivered', 'stopped');
 
--- An active copy that disappeared at the source no longer reserves the rover.
+-- Frigiv bilen, hvis den aktive tur er fjernet lokalt.
 DELETE FROM public.medirover_orders AS saved
 WHERE saved.status IN ('pending', 'running', 'delivered', 'stopped')
   AND NOT EXISTS (SELECT 1 FROM incoming_orders WHERE request_id = saved.request_id);

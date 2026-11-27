@@ -1,0 +1,6 @@
+﻿Antal;Referencer;Komponent;Bemærkning
+1;PS101;5 V DC / 1 A / 5 W*;"Brugerens 5 W-adapter behandles som reguleret 5 V DC / 1 A. Spænding og stikpolaritet er designantagelse, ikke fotoverificeret. Tilslut efter + og -; kontakt-/stiktype fastlægges ved montage."
+1;SW101;Afbryder;Valgt / bestykning kontrolleres
+1;SW201;Trykknap / 4 ben / NO;"To internt forbundne benpar. Par identificeres med kontinuitet; normalt åben mellem par."
+1;U101;ESP-32D / DevKitC V4 / 38 ben;"38 ben fra ITT Lab/producentpinout; eksisterende kortmærkning verificeres"
+1;U201;3144 Hall / aktiv lav;Fjern R1 på modulet. Forsyn modulet med 5 V og træk S op til 3,3 V via R201.

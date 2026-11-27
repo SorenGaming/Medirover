@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "filename": "Bil.kicad_pro",
+    "version": 1
+  },
+  "text_variables": {
+    "REV": "0.17",
+    "STATUS": "Designvalg med markerede antagelser; hardwaretest afventer"
+  }
+}

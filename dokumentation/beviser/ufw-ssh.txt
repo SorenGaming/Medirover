@@ -1,0 +1,21 @@
+U39 | SSH-firewallprøve den 19. november 2026
+
+Windows, udvalgte linjer fra PowerShell-udskriften
+Windows oprettede separate TCP-forbindelser til port 22 med eksplicit kilde-IP. Den midlertidige adresse blev kun tilføjet i ActiveStore.
+
+2026-11-19T12:09:27+01:00 FOER 10.20.10.10:51631 -> 10.20.20.10:22 | TCP CONNECTED
+2026-11-19T12:09:34+01:00 TEST 10.20.10.11:54975 -> 10.20.20.10:22 | TIMEOUT > 5 s
+Testadressen 10.20.10.11 er fjernet (ActiveStore).
+2026-11-19T12:09:39+01:00 EFTER 10.20.10.10:59885 -> 10.20.20.10:22 | TCP CONNECTED
+Wi-Fi: Wi-Fi / 10.20.10.10/24 (statisk)
+
+Ubuntu, udvalgte felter fra brugerens udskrift af systemjournalen
+
+2026-11-19T12:09:21+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=15279 PROTO=TCP SPT=54975 DPT=22 SYN
+2026-11-19T12:09:22+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=15280 PROTO=TCP SPT=54975 DPT=22 SYN
+2026-11-19T12:09:25+01:00 Sorengaming kernel: [UFW BLOCK] IN=enx606d3ce5a9c0
+    SRC=10.20.10.11 DST=10.20.20.10 ID=15281 PROTO=TCP SPT=54975 DPT=22 SYN
+
+Loggens kilde- og destinationsadresser, protokol, afsenderport og destinationsport matcher Windows-prøven. Første Ubuntu-logtid ligger 13 sekunder før teststart ifølge Windows. Tiderne er gengivet som observeret. U39 målte TCP-adgang til port 22. Det tidligere SSH-login er dokumenteret i U32.

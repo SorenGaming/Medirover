@@ -1,0 +1,4 @@
+﻿GPIO;Net;Fysisk headerben;Status
+GPIO4;HALL_FIXED;J3.13;Revision 0.7
+GPIO13;LID_BASE;J2.15;Revision 0.7
+GPIO23;SERVO_BASE;J3.2;Revision 0.7

@@ -1,0 +1,14 @@
+R2-T06 modtaget13november2026. Relevante brugerlinjer normaliseret;
+ikke rå terminalfil. Ingen konfigurering påR2 vist, kun aflæsning.
+R2-LAN-B#show ip route ospf
+Gateway of last resort is10.20.254.1 to network0.0.0.0
+O*E2 0.0.0.0/0 [110/1] via10.20.254.1,00:08:12,GigabitEthernet0/1
+O 10.20.10.0/24 [110/2] via10.20.254.1,00:42:27,GigabitEthernet0/1
+O 10.20.20.0/24 [110/2] via10.20.254.1,00:42:27,GigabitEthernet0/1
+O 10.20.99.0/24 [110/2] via10.20.254.1,00:42:27,GigabitEthernet0/1
+R2-LAN-B#show ip ospf neighbor
+1.1.1.1 Pri0 FULL/- Dead00:00:35 Address10.20.254.1 InterfaceG0/1
+Dette dokumenterer R2s modtagelse af default og de forventede R1-fjernnet.
+Sammen med R1-T06 og R1-T10 er N03s OSPF-/rutekontrol bestået.
+Ingen klient-NAT-translation, Ubuntu-IP, DNS/web-regler, R1-overload-linje
+eller ny R1-gemmebekræftelse medsendt. Ingen samlet WAN-sikkerhedstest.

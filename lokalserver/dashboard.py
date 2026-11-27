@@ -1,7 +1,6 @@
 from contextlib import contextmanager
 from datetime import datetime, timezone
 import math
-import os
 from pathlib import Path
 from typing import Literal
 
@@ -52,10 +51,10 @@ def register_dashboard(app, connect):
 
     @app.get("/", include_in_schema=False)
     def website():
-        notice = ""
-        if os.environ.get("MEDIROVER_DEMO") == "1":
-            notice = '<aside class="notice">Demotilstand. Ture og målinger kan være testdata.</aside>'
-        return HTMLResponse((STATIC / "index.html").read_text(encoding="utf-8").replace("<!--environment-->", notice), headers={"Cache-Control": "no-cache"})
+        return HTMLResponse(
+            (STATIC / "index.html").read_text(encoding="utf-8"),
+            headers={"Cache-Control": "no-cache"},
+        )
 
     @app.get("/api/orders")
     def history(

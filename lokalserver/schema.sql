@@ -13,7 +13,7 @@ ALTER TABLE medirover_orders
     ADD CONSTRAINT medirover_orders_status_check CHECK (status IN (
         'pending', 'running', 'delivered', 'completed', 'stopped', 'cancelled', 'rejected'));
 
--- one rover: one active trip
+-- Det unikke indeks tillader højst én aktiv tur.
 DROP INDEX IF EXISTS medirover_one_running_order;
 CREATE UNIQUE INDEX IF NOT EXISTS medirover_one_active_order
     ON medirover_orders ((true)) WHERE status IN ('pending', 'running', 'delivered', 'stopped');

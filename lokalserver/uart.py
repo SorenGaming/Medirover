@@ -92,7 +92,7 @@ class Base:
         while not stop.is_set():
             port = Serial()
             port.port, port.baudrate, port.timeout = self.device, 115200, 0.2
-            port.dtr = port.rts = False  # do not reset the ESP32
+            port.dtr = port.rts = False  # Undgå at genstarte ESP32.
             try:
                 port.open()
                 self.port = port
@@ -108,7 +108,7 @@ class Base:
     def accept(self, frame):
         try:
             accept_frame(frame, self.reply_or_event, self.temperature_callback)
-        except Exception:  # one bad line must not stop the reader
+        except Exception:  # Fortsæt med at læse efter en ugyldig linje.
             LOG.exception("UART line failed: %r", frame)
 
     def reply_or_event(self, kind, trip, value):

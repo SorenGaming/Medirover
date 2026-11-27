@@ -1,0 +1,7 @@
+﻿Antal;Referencer;Komponent;Bemærkning
+1;J201;Linux USB / kabel til DevKit;"Indbygget CP2102N bruges til UART0; intet ekstra UART-modul"
+1;M201;MG90S / lågeservo;"Valgt af bruger. 5 V; strøm og mekaniske endepunkter afprøves."
+1;PS101;5 V DC / 1 A / 5 W*;"Brugerens 5 W-adapter behandles som reguleret 5 V DC / 1 A. Spænding og stikpolaritet er designantagelse, ikke fotoverificeret. Tilslut efter + og -; kontakt-/stiktype fastlægges ved montage."
+1;SW201;Lågkontakt / S-G-V print;"Fotograferet mekanisk S/G/V-endstopprint. V=3,3 V, G=GND, S=signal. Aktiv lav er arbejdsantagelse; aktivniveau kontrolleres ved firmwaretest. Intet 5 V-signal til GPIO."
+1;U101;ESP-32D / DevKitC V4 / 38 ben;"38 ben fra ITT Lab/producentpinout; eksisterende kortmærkning verificeres"
+1;U201;3144 Hall / aktiv lav;Fjern R1 på modulet. Forsyn modulet med 5 V og træk S op til 3,3 V via R201.

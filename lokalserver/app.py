@@ -16,9 +16,9 @@ from uart import Base
 
 Station = Annotated[int, Field(strict=True, ge=1, le=2)]
 Status = Literal["pending", "running", "delivered", "completed", "stopped", "cancelled", "rejected"]
-ACTIVE = ("pending", "running", "delivered", "stopped")  # the rover is reserved
+ACTIVE = ("pending", "running", "delivered", "stopped")
 COLUMNS = "request_id, station, status, last_error, created_at"
-CONTROLS = {  # button: (allowed statuses, command, new status)
+CONTROLS = {  # Knap, tilladte tilstande, UART-kommando og ny tilstand.
     "packed": (("pending",), "KLAR", None),
     "stop": (ACTIVE, "STOP", "stopped"),
     "resume": (("running", "delivered"), "FORTSAET", None),

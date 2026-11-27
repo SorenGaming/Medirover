@@ -2,7 +2,7 @@
 set -euo pipefail
 umask 077
 
-# Called with the timestamp of a successful, checksum-verified transfer.
+# Opdater kun tidspunktet, efter at modtageren har bekræftet SHA-256.
 static_dir="$(cd -- "$(dirname -- "$0")/../static" && pwd)"
 completed_at=$(date --iso-8601=seconds --date="$1")
 status_file=$(mktemp "$static_dir/.backup-status.XXXXXX")

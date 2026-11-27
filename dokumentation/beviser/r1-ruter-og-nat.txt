@@ -1,0 +1,22 @@
+R1-T10 modtaget 13 november 2026. Relevant normaliseret brugeroutput,
+ikke rå terminalfil. Logtid Nov13 19:38:01.659/03.339 ikke verificeret.
+Interface NVI0 line protocol up; konfiguration fra console.
+show ip nat statistics:
+Total active translations0 (0static,0dynamic;0extended),peak0.
+Outside GigabitEthernet0/0.900.
+Inside GigabitEthernet0/0.10,GigabitEthernet0/0.20,GigabitEthernet0/1.
+Hits0,Misses0,CEF Translated0,CEF Punted0,Expired0.
+Dynamic mappings Inside Source:
+[Id1] access-list NAT_MEDIROVER interface GigabitEthernet0/0.900 refcount0.
+show access-lists NAT_MEDIROVER:
+20 permit10.20.20.10;30 permit10.20.30.10;10 permit10.20.10.10.
+Ingen wildcard vist, altså de tre præcise værtsadresser.
+show ip ospf database external 0.0.0.0:
+Router ID1.1.1.1 process1. Type-5 AS External Link States.
+LS age9, LS type AS External Link, Link State ID0.0.0.0.
+Advertising Router1.1.1.1,Seq80000001,Checksum0x1D91,Length36.
+Mask/0,Metric Type2,MTID0,Metric1,Forward Address0.0.0.0,Tag1.
+NAT-indstillinger/mapping og egen default-LSA er dokumenteret; der er
+ingen aktiv oversættelse eller faktisk klienttest. Global NAT-kommandos
+overload-ord ikke vist direkte. R2s modtagelse af ruten endnu ikke vist.
+R1-gemning, DNS/web-politik, klient-IP og negativ trafiktest afventer.

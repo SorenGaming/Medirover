@@ -1,0 +1,10 @@
+{
+  "meta": {
+    "filename": "Base.kicad_pro",
+    "version": 1
+  },
+  "text_variables": {
+    "REV": "0.15",
+    "STATUS": "Designvalg med markerede antagelser; hardwaretest afventer"
+  }
+}

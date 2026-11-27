@@ -1,0 +1,58 @@
+$ journalctl -u medirover, selected times and original messages
+2026-11-25T15:51:45+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# R har meldt sig\r\n'
+2026-11-25T15:51:45+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: klar\r\n'
+2026-11-25T15:51:45+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# R har meldt sig\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART open: /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'ets Jul 29 2019 12:21:46\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'configsip: 0, SPIWP:0xee\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: WARNING:  UART rejected: frame too long
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'mode:DIO, clock div:2\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'load:0x3fff0030,len:4112\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'load:0x40078000,len:15072\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'load:0x40080400,len:4\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'load:0x40080404,len:3332\r\n'
+2026-11-25T15:52:19+01:00 Sorengaming python[2715]: INFO:     UART not used: b'entry 0x400805ac\r\n'
+2026-11-25T15:52:20+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# Base klar\r\n'
+2026-11-25T15:53:15+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:52090 - "POST /api/orders HTTP/1.0" 201 Created
+2026-11-25T15:53:23+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,c28be042-2a9c-4261-a630-c1f5d5b2f703,R,OPEN\r\n'
+2026-11-25T15:53:41+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:60148 - "POST /api/orders/c28be042-2a9c-4261-a630-c1f5d5b2f703/stop HTTP/1.0" 200 OK
+2026-11-25T15:53:42+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:60198 - "POST /api/orders/c28be042-2a9c-4261-a630-c1f5d5b2f703/close HTTP/1.0" 200 OK
+2026-11-25T15:53:57+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:59956 - "POST /api/orders HTTP/1.0" 201 Created
+2026-11-25T15:54:05+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,R,OPEN\r\n'
+2026-11-25T15:54:08+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:59558 - "POST /api/orders/2b8f5a46-1d4b-445b-8859-95d89ebc7ef0/packed HTTP/1.0" 200 OK
+2026-11-25T15:54:16+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,R,CLOSED\r\n'
+2026-11-25T15:54:38+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: drejer venstre\r\n'
+2026-11-25T15:54:57+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: stopstreg\r\n'
+2026-11-25T15:54:57+01:00 Sorengaming python[2715]: INFO:     UART not used: b'ARRIVED,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,1\r\n'
+2026-11-25T15:54:57+01:00 Sorengaming python[2715]: INFO:     UART not used: b'HALL,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,1\r\n'
+2026-11-25T15:55:06+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,R,OPEN\r\n'
+2026-11-25T15:55:09+01:00 Sorengaming python[2715]: INFO:     UART accepted: ACK trip=2b8f5a46-1d4b-445b-8859-95d89ebc7ef0 value=1
+2026-11-25T15:55:17+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,R,CLOSED\r\n'
+2026-11-25T15:55:36+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: drejer hoejre\r\n'
+2026-11-25T15:55:58+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: stopstreg\r\n'
+2026-11-25T15:55:58+01:00 Sorengaming python[2715]: INFO:     UART not used: b'HALL,2b8f5a46-1d4b-445b-8859-95d89ebc7ef0,0\r\n'
+2026-11-25T15:55:58+01:00 Sorengaming python[2715]: INFO:     UART accepted: HOME trip=2b8f5a46-1d4b-445b-8859-95d89ebc7ef0 value=None
+2026-11-25T16:10:51+01:00 Sorengaming python[2715]: INFO:     UART accepted: NAK trip=f0c68135-f59e-430e-8e0d-3d24c28b5f93 value=NOT_HOME
+2026-11-25T16:10:51+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:51994 - "POST /api/orders HTTP/1.0" 409 Conflict
+2026-11-25T16:11:11+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:58744 - "POST /api/orders HTTP/1.0" 201 Created
+2026-11-25T16:11:20+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,1fb3e266-1c1d-4b0b-b7d7-513e16978645,R,OPEN\r\n'
+2026-11-25T16:11:21+01:00 Sorengaming python[2715]: INFO:     127.0.0.1:51974 - "POST /api/orders/1fb3e266-1c1d-4b0b-b7d7-513e16978645/packed HTTP/1.0" 200 OK
+2026-11-25T16:11:29+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,1fb3e266-1c1d-4b0b-b7d7-513e16978645,R,CLOSED\r\n'
+2026-11-25T16:11:51+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: ligeud\r\n'
+2026-11-25T16:11:57+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: drejer hoejre\r\n'
+2026-11-25T16:12:10+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: stopstreg\r\n'
+2026-11-25T16:12:11+01:00 Sorengaming python[2715]: INFO:     UART not used: b'ARRIVED,1fb3e266-1c1d-4b0b-b7d7-513e16978645,2\r\n'
+2026-11-25T16:12:11+01:00 Sorengaming python[2715]: INFO:     UART not used: b'HALL,1fb3e266-1c1d-4b0b-b7d7-513e16978645,2\r\n'
+2026-11-25T16:12:20+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,1fb3e266-1c1d-4b0b-b7d7-513e16978645,R,OPEN\r\n'
+2026-11-25T16:12:22+01:00 Sorengaming python[2715]: INFO:     UART accepted: ACK trip=1fb3e266-1c1d-4b0b-b7d7-513e16978645 value=2
+2026-11-25T16:12:30+01:00 Sorengaming python[2715]: INFO:     UART not used: b'LID,1fb3e266-1c1d-4b0b-b7d7-513e16978645,R,CLOSED\r\n'
+2026-11-25T16:12:43+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: drejer venstre\r\n'
+2026-11-25T16:12:55+01:00 Sorengaming python[2715]: INFO:     UART not used: b'# BIL: kryds: ligeud\r\n'
+
+$ journalctl recent USB loss
+2026-11-25T16:24:25+01:00 Sorengaming python[6220]: WARNING:  UART unavailable (device reports readiness to read but returned no data (device disconnected or multiple access on port?)), retrying in 2 s
+2026-11-25T16:24:27+01:00 Sorengaming python[6220]: WARNING:  UART unavailable ([Errno 2] could not open port /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0: [Errno 2] No such file or directory: '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0'), retrying in 2 s
+2026-11-25T16:24:29+01:00 Sorengaming python[6220]: WARNING:  UART unavailable ([Errno 2] could not open port /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0: [Errno 2] No such file or directory: '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0'), retrying in 2 s
+2026-11-25T16:24:31+01:00 Sorengaming python[6220]: WARNING:  UART unavailable ([Errno 2] could not open port /dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0: [Errno 2] No such file or directory: '/dev/serial/by-id/usb-Silicon_Labs_CP2102_USB_to_UART_Bridge_Controller_0001-if00-port0'), retrying in 2 s

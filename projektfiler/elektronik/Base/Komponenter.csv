@@ -1,0 +1,21 @@
+﻿Reference;Værdi;Symbol;Side;Status;DNP
+C101;100n / 16V;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+C102;100u / 10V;Medirover:C_Polarized_Compact;Base;Valgt / bestykning kontrolleres;no
+C103;100n / 10V;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+C203;100n / 16V;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+C210;100n;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+C211;100n;Medirover:C_Compact;Base;Lokal afkobling ved endstopprint.;no
+C220;470u / 10V;Medirover:C_Polarized_Compact;Base;Valgt / bestykning kontrolleres;no
+C221;100n / 16V;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+C222;100n / 10V;Medirover:C_Compact;Base;Valgt / bestykning kontrolleres;no
+J201;Linux USB / kabel til DevKit;Medirover:Linux_server_USB;Base;"Indbygget CP2102N bruges til UART0; intet ekstra UART-modul";no
+M201;MG90S / lågeservo;Medirover:Servo_MG90S;Base;"Valgt af bruger. 5 V; strøm og mekaniske endepunkter afprøves.";no
+PS101;5 V DC / 1 A / 5 W*;Medirover:5V_DC_adapter;Base;"Brugerens 5 W-adapter behandles som reguleret 5 V DC / 1 A. Spænding og stikpolaritet er designantagelse, ikke fotoverificeret. Tilslut efter + og -; kontakt-/stiktype fastlægges ved montage.";no
+R201;4k7;Medirover:R_Compact;Base;Ekstern pull-up til 3,3 V efter fjernelse af R1 på Hall-modulet.;no
+R210;10k;Medirover:R_Compact;Base;Valgt / bestykning kontrolleres;no
+R211;1k;Medirover:R_Compact;Base;Valgt / bestykning kontrolleres;no
+R220;1k;Medirover:R_Compact;Base;Seriemodstand på direkte 3,3 V PWM fra ESP32.;no
+R221;100k;Medirover:R_Compact;Base;Valgt / bestykning kontrolleres;no
+SW201;Lågkontakt / S-G-V print;Medirover:Endstopprint_S_G_V;Base;"Fotograferet mekanisk S/G/V-endstopprint. V=3,3 V, G=GND, S=signal. Aktiv lav er arbejdsantagelse; aktivniveau kontrolleres ved firmwaretest. Intet 5 V-signal til GPIO.";no
+U101;ESP-32D / DevKitC V4 / 38 ben;Medirover:ESP32_DevKitC_V4_WROOM32;Base;"38 ben fra ITT Lab/producentpinout; eksisterende kortmærkning verificeres";no
+U201;3144 Hall / aktiv lav;Medirover:Hall_3144EUA_S_modul;Base;Fjern R1 på modulet. Forsyn modulet med 5 V og træk S op til 3,3 V via R201.;no

@@ -1,1 +1,6 @@
 * text=auto eol=lf
+# Bevar projektfilerne byte for byte fra det program, der eksporterede dem.
+projektfiler/cad/** -text whitespace=cr-at-eol
+projektfiler/elektronik/** -text whitespace=cr-at-eol
+*.drawio -text whitespace=cr-at-eol
+*.step -diff
